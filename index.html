@@ -1,1 +1,365 @@
+<!DOCTYPE html>
 
+<html dir="rtl" lang="ar"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&amp;family=Work+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-primary": "#ffb77d",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-highest": "#e4e2e2",
+                        "surface-bright": "#fbf9f8",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "primary-container": "#ff8c00",
+                        "on-tertiary-container": "#3d3f3f",
+                        "on-primary-fixed": "#2f1500",
+                        "outline-variant": "#ddc1ae",
+                        "on-surface": "#1b1c1c",
+                        "inverse-on-surface": "#f2f0f0",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#303031",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "on-primary-fixed-variant": "#6e3900",
+                        "on-error-container": "#93000a",
+                        "background": "#fbf9f8",
+                        "surface": "#fbf9f8",
+                        "secondary-container": "#e2dfde",
+                        "on-surface-variant": "#564334",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#ffdcc3",
+                        "primary": "#904d00",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "tertiary": "#5d5f5f",
+                        "surface-container": "#efeded",
+                        "primary-fixed-dim": "#ffb77d",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "secondary-fixed": "#e5e2e1",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#623200",
+                        "secondary": "#5f5e5e",
+                        "on-secondary-container": "#636262",
+                        "on-background": "#1b1c1c",
+                        "surface-dim": "#dbdad9",
+                        "outline": "#897362",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#e4e2e2",
+                        "error": "#ba1a1a",
+                        "surface-container-low": "#f5f3f3",
+                        "tertiary-container": "#a9aaaa",
+                        "surface-container-high": "#e9e8e7",
+                        "on-secondary-fixed-variant": "#474746",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#e2e2e2",
+                        "surface-tint": "#904d00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "gutter": "16px",
+                        "unit": "8px",
+                        "container-margin": "24px",
+                        "stack-lg": "32px",
+                        "stack-md": "16px",
+                        "section-padding": "64px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["IBM Plex Sans Arabic"],
+                        "display-lg": ["IBM Plex Sans Arabic"],
+                        "label-md": ["Work Sans"],
+                        "caption": ["IBM Plex Sans Arabic"],
+                        "body-lg": ["IBM Plex Sans Arabic"],
+                        "headline-lg": ["IBM Plex Sans Arabic"],
+                        "body-md": ["IBM Plex Sans Arabic"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "label-md": ["14px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "caption": ["12px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #fbf9f8;
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="text-on-surface">
+<div class="flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="fixed h-full w-72 border-r rtl:border-l rtl:border-r-0 bg-white dark:bg-zinc-950 border-zinc-100 dark:border-zinc-800 flex flex-col h-screen p-4 gap-2 overflow-y-auto z-40">
+<div class="mb-8 px-4 py-6">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-12 h-12 rounded-xl bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl">restaurant</span>
+</div>
+<div>
+<h1 class="text-xl font-black text-orange-600 dark:text-orange-500 font-headline-md">TRKAT Vendor</h1>
+<p class="text-zinc-500 text-xs font-caption">Premium Hospitality</p>
+</div>
+</div>
+<button class="w-full bg-primary text-white py-3 px-4 rounded-xl font-label-md flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-lg">local_shipping</span>
+                    View Live Truck
+                </button>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Dashboard is Active -->
+<a class="flex items-center gap-3 bg-orange-50 dark:bg-orange-950/30 text-orange-600 dark:text-orange-400 rounded-lg px-4 py-3 border-r-4 border-orange-500 active:translate-x-1 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-sans text-sm font-semibold">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 text-zinc-500 dark:text-zinc-400 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-sans text-sm font-semibold">Orders</span>
+</a>
+<a class="flex items-center gap-3 text-zinc-500 dark:text-zinc-400 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="distance">distance</span>
+<span class="font-sans text-sm font-semibold">Location</span>
+</a>
+<a class="flex items-center gap-3 text-zinc-500 dark:text-zinc-400 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="schedule">schedule</span>
+<span class="font-sans text-sm font-semibold">Business Hours</span>
+</a>
+<a class="flex items-center gap-3 text-zinc-500 dark:text-zinc-400 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="restaurant_menu">restaurant_menu</span>
+<span class="font-sans text-sm font-semibold">Menu</span>
+</a>
+<a class="flex items-center gap-3 text-zinc-500 dark:text-zinc-400 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="local_offer">local_offer</span>
+<span class="font-sans text-sm font-semibold">Offers</span>
+</a>
+<a class="flex items-center gap-3 text-zinc-500 dark:text-zinc-400 px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
+<span class="font-sans text-sm font-semibold">Analytics</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 border-t border-zinc-100">
+<a class="flex items-center gap-3 text-zinc-500 px-4 py-3 hover:text-zinc-900" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-sans text-sm font-semibold">Support</span>
+</a>
+<a class="flex items-center gap-3 text-error px-4 py-3 hover:bg-error-container/20 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-sans text-sm font-semibold">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 mr-72 bg-surface min-h-screen">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md shadow-sm border-b border-zinc-100 dark:border-zinc-800 flex justify-between items-center h-16 px-8 w-full">
+<div class="flex items-center gap-4">
+<h2 class="text-headline-md font-headline-md text-on-surface">ملخص الأعمال اليومي</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 px-3 py-1 bg-primary-fixed rounded-full">
+<div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+<span class="text-primary font-label-md text-xs">مباشر الآن</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-zinc-500 hover:bg-zinc-50 p-2 rounded-full transition-colors" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined text-zinc-500 hover:bg-zinc-50 p-2 rounded-full transition-colors" data-icon="settings">settings</button>
+<div class="h-10 w-10 rounded-full overflow-hidden border-2 border-primary-fixed">
+<img class="w-full h-full object-cover" data-alt="Close-up portrait of a professional food truck chef wearing a clean white apron in a modern kitchen setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_zTW1c0hr3Kxf4VCDvxsVNWRpUUVJE_qmbJ9_HLGl9PRcDKkdLsacPl1H7ykEHWwVj4GBtMWnVUdBzfdvYo_jdvM7tqHYxdyTQIBGil_xkcCLz_doJq7yY2NEE8ajfabugwFP5PLZX5nzvX_f0Xb0UBWi1d6hJBgwvBYfBTqXuKi7li3jBvg_iC33BkaCLv6SyapNE_qogJayUMGD1fDkaqTJqIuuRLfy6N7c4GIliFhaMqQg-PnZlORsQToMQsu2Tv2PQiqQpInK"/>
+</div>
+</div>
+</div>
+</header>
+<div class="p-8">
+<!-- Financial Snapshot (Elevated) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<div class="glass-card p-6 rounded-2xl shadow-sm border border-zinc-100 flex items-center justify-between">
+<div>
+<p class="text-zinc-500 font-body-md mb-1">إجمالي المبيعات اليوم</p>
+<h3 class="text-headline-lg font-headline-lg text-primary">1,250.00 ر.س</h3>
+</div>
+<div class="w-14 h-14 rounded-2xl bg-primary-fixed/50 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl">payments</span>
+</div>
+</div>
+<div class="glass-card p-6 rounded-2xl shadow-sm border border-zinc-100 flex items-center justify-between">
+<div>
+<p class="text-zinc-500 font-body-md mb-1">الرصيد المتاح</p>
+<h3 class="text-headline-lg font-headline-lg text-on-surface">4,820.00 ر.س</h3>
+</div>
+<div class="w-14 h-14 rounded-2xl bg-secondary-container/50 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary text-3xl">account_balance_wallet</span>
+</div>
+</div>
+<div class="bg-primary text-white p-6 rounded-2xl shadow-xl shadow-primary/20 flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="font-label-md">النمو الأسبوعي</span>
+<span class="material-symbols-outlined">trending_up</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-4xl font-bold">+24%</span>
+<span class="text-orange-200 text-sm">مقارنة بالأسبوع الماضي</span>
+</div>
+</div>
+</div>
+<!-- Main Bento Grid -->
+<div class="bento-grid">
+<!-- Orders Summary (Large Span) -->
+<div class="col-span-12 lg:col-span-8 bg-white rounded-3xl p-8 shadow-sm border border-zinc-50">
+<div class="flex justify-between items-center mb-6">
+<h4 class="text-headline-md font-headline-md">آخر الطلبات النشطة</h4>
+<button class="text-primary font-label-md flex items-center gap-1">عرض الكل <span class="material-symbols-outlined text-sm">arrow_back</span></button>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-4 bg-zinc-50 rounded-2xl hover:bg-zinc-100 transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm">
+<span class="text-zinc-400 font-bold">#102</span>
+</div>
+<div>
+<p class="font-headline-md text-sm">برجر كلاسيك + بطاطس</p>
+<p class="text-xs text-zinc-500">منذ 3 دقائق • دفع إلكتروني</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-xs font-bold">قيد التحضير</span>
+<span class="font-bold text-on-surface">45.00 ر.س</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 bg-zinc-50 rounded-2xl hover:bg-zinc-100 transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm">
+<span class="text-zinc-400 font-bold">#101</span>
+</div>
+<div>
+<p class="font-headline-md text-sm">وجبة عائلية (مكس)</p>
+<p class="text-xs text-zinc-500">منذ 12 دقيقة • دفع نقدي</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="px-3 py-1 bg-green-100 text-green-600 rounded-full text-xs font-bold">جاهز للتسليم</span>
+<span class="font-bold text-on-surface">120.00 ر.س</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 bg-zinc-50 rounded-2xl hover:bg-zinc-100 transition-colors opacity-75">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm">
+<span class="text-zinc-400 font-bold">#100</span>
+</div>
+<div>
+<p class="font-headline-md text-sm">تاكو دجاج حراق (3 قطع)</p>
+<p class="text-xs text-zinc-500">منذ 25 دقيقة • دفع إلكتروني</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="px-3 py-1 bg-zinc-200 text-zinc-600 rounded-full text-xs font-bold">تم التسليم</span>
+<span class="font-bold text-on-surface">38.00 ر.س</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Location Quick-View -->
+<div class="col-span-12 lg:col-span-4 bg-white rounded-3xl overflow-hidden shadow-sm border border-zinc-50">
+<div class="p-6">
+<h4 class="text-headline-md font-headline-md mb-2">موقع الشاحنة الحالي</h4>
+<div class="flex items-center gap-2 text-zinc-500 mb-4">
+<span class="material-symbols-outlined text-sm">location_on</span>
+<span class="text-sm">بوليفارد الرياض، حطين</span>
+</div>
+</div>
+<div class="h-48 relative">
+<img class="w-full h-full object-cover" data-alt="Detailed digital map layout of Riyadh boulevard district with minimalist orange route markers and food truck icons" data-location="Riyadh, Saudi Arabia" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZL7VHv-wuL-lk3ULdodkxK8dyE9mC2gaKWsAaKz9qOzHvZRN_-4l7QDW4FfnyAZhbQZrSuWFU7X_duocAGwug3HV1L6Xf69G0K7C4WIqqgQPeabNGJqDIHtSwrzAe00I5ckGzS7bqIS-prtYZNzaNzGh1XZDl_u3ncvqGOZU0UZzgB4kkhVhLywa4HUDlDp5x5eqO9chECaG-2oORpvgSelbXtD1XiqDpmyk9TMGJYDOqzqgnUYUC0ODa1TtuPyVrfzTRnuyedXXT"/>
+<div class="absolute inset-0 bg-primary/10"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+<div class="relative">
+<div class="absolute inset-0 bg-primary rounded-full animate-ping opacity-75"></div>
+<div class="relative w-10 h-10 bg-primary border-4 border-white rounded-full flex items-center justify-center shadow-xl">
+<span class="material-symbols-outlined text-white text-xl">local_shipping</span>
+</div>
+</div>
+</div>
+</div>
+<div class="p-4 bg-primary-fixed/20 flex justify-center">
+<button class="text-primary font-bold text-sm">تحديث الموقع</button>
+</div>
+</div>
+<!-- Insights & Status Grid (Three small cards) -->
+<div class="col-span-12 lg:col-span-4 bg-white rounded-3xl p-6 shadow-sm border border-zinc-50 flex flex-col justify-between">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-primary bg-primary-fixed/30 p-3 rounded-2xl">schedule</span>
+<span class="px-2 py-1 bg-green-100 text-green-700 rounded-md text-[10px] font-bold">مفتوح</span>
+</div>
+<div>
+<h5 class="text-zinc-500 text-sm mb-1">ساعات العمل اليوم</h5>
+<p class="font-headline-md">04:00 م - 12:00 ص</p>
+</div>
+<div class="mt-4 pt-4 border-t border-zinc-100">
+<div class="flex justify-between text-xs text-zinc-400">
+<span>متبقي 5 ساعات</span>
+<span>65% من اليوم</span>
+</div>
+<div class="w-full h-1.5 bg-zinc-100 rounded-full mt-2">
+<div class="w-[65%] h-full bg-primary rounded-full"></div>
+</div>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-4 bg-white rounded-3xl p-6 shadow-sm border border-zinc-50 flex flex-col justify-between">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-primary bg-primary-fixed/30 p-3 rounded-2xl">restaurant_menu</span>
+</div>
+<div>
+<h5 class="text-zinc-500 text-sm mb-1">حالة القائمة</h5>
+<p class="font-headline-md text-2xl">24 صنف نشط</p>
+</div>
+<div class="flex gap-2 mt-4">
+<span class="px-2 py-1 bg-zinc-100 text-zinc-600 rounded text-[10px] font-medium">3 غير متوفر</span>
+<span class="px-2 py-1 bg-zinc-100 text-zinc-600 rounded text-[10px] font-medium">5 الأكثر طلباً</span>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-4 bg-white rounded-3xl p-6 shadow-sm border border-zinc-50 flex flex-col justify-between">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-primary bg-primary-fixed/30 p-3 rounded-2xl">local_offer</span>
+</div>
+<div>
+<h5 class="text-zinc-500 text-sm mb-1">العروض النشطة</h5>
+<p class="font-headline-md text-2xl">2 عرض ترويجي</p>
+</div>
+<div class="mt-4 p-3 bg-orange-50 rounded-xl border border-orange-100">
+<p class="text-xs text-orange-700 font-bold">خصم 20% على وجبات العشاء</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
