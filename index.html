@@ -109,8 +109,8 @@
             border-color: #2563eb;
         }
         .drop-zone--over {
-            border-color: #003d9b;
-            background-color: #dae2ff;
+            border-color: #003d9b !important;
+            background-color: #dae2ff !important;
         }
         .hidden { display: none; }
         @keyframes spin {
@@ -136,8 +136,8 @@
 <!-- Navigation Links (Desktop) -->
 <nav class="hidden md:flex flex-row-reverse gap-gutter items-center">
 <button class="nav-link active text-slate-600 dark:text-slate-400 hover:text-blue-500 font-inter text-sm font-medium transition-colors pb-1" data-nav="home" onclick="showView('home')">الرئيسية</button>
-<button class="nav-link text-slate-600 dark:text-slate-400 hover:text-blue-500 font-inter text-sm font-medium transition-colors pb-1" onclick="alert('ستتوفر ميزة التحويل قريباً')">تحويل</button>
-<button class="nav-link text-slate-600 dark:text-slate-400 hover:text-blue-500 font-inter text-sm font-medium transition-colors pb-1" onclick="alert('ستتوفر ميزة التعديل قريباً')">تعديل</button>
+<button class="nav-link text-slate-600 dark:text-slate-400 hover:text-blue-500 font-inter text-sm font-medium transition-colors pb-1" data-nav="generic" onclick="showGenericTool('دمج PDF', 'call_merge')">دمج</button>
+<button class="nav-link text-slate-600 dark:text-slate-400 hover:text-blue-500 font-inter text-sm font-medium transition-colors pb-1" data-nav="generic" onclick="showGenericTool('تحويل PDF', 'description')">تحويل</button>
 <button class="nav-link text-slate-600 dark:text-slate-400 hover:text-blue-500 font-inter text-sm font-medium transition-colors pb-1" data-nav="sign" onclick="showView('sign')">توقيع</button>
 </nav>
 <!-- Trailing Actions -->
@@ -165,50 +165,50 @@
 <h3 class="font-h3 text-h3 mb-xs font-bold">توقيع PDF</h3>
 <p class="font-body-sm text-body-sm text-on-surface-variant">أضف توقيعك الإلكتروني للمستندات بسهولة وأمان.</p>
 </div>
-<!-- Other Cards (Not functional but stylized) -->
-<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer" onclick="alert('هذه الميزة قيد التطوير')">
+<!-- Other Cards -->
+<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer" onclick="showGenericTool('دمج PDF', 'call_merge')">
 <div class="w-12 h-12 bg-secondary-fixed rounded-full flex items-center justify-center mb-sm group-hover:bg-secondary-container transition-colors">
 <span class="material-symbols-outlined text-secondary" data-icon="call_merge">call_merge</span>
 </div>
 <h3 class="font-h3 text-h3 mb-xs font-bold">دمج PDF</h3>
 <p class="font-body-sm text-body-sm text-on-surface-variant">اجمع عدة ملفات في مستند واحد مرتب.</p>
 </div>
-<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer" onclick="alert('هذه الميزة قيد التطوير')">
+<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer" onclick="showGenericTool('تقسيم PDF', 'call_split')">
 <div class="w-12 h-12 bg-secondary-fixed rounded-full flex items-center justify-center mb-sm group-hover:bg-secondary-container transition-colors">
 <span class="material-symbols-outlined text-secondary" data-icon="call_split">call_split</span>
 </div>
 <h3 class="font-h3 text-h3 mb-xs font-bold">تقسيم PDF</h3>
 <p class="font-body-sm text-body-sm text-on-surface-variant">استخراج صفحات محددة أو تقسيم الملف لعدة أجزاء.</p>
 </div>
-<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer" onclick="alert('هذه الميزة قيد التطوير')">
+<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer" onclick="showGenericTool('ضغط PDF', 'compress')">
 <div class="w-12 h-12 bg-secondary-fixed rounded-full flex items-center justify-center mb-sm group-hover:bg-secondary-container transition-colors">
 <span class="material-symbols-outlined text-secondary" data-icon="compress">compress</span>
 </div>
 <h3 class="font-h3 text-h3 mb-xs font-bold">ضغط PDF</h3>
 <p class="font-body-sm text-body-sm text-on-surface-variant">تقليل حجم الملف دون التأثير على الجودة.</p>
 </div>
-<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer" onclick="alert('هذه الميزة قيد التطوير')">
+<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer" onclick="showGenericTool('Word إلى PDF', 'description')">
 <div class="w-12 h-12 bg-tertiary-fixed rounded-full flex items-center justify-center mb-sm group-hover:bg-tertiary-container transition-colors">
 <span class="material-symbols-outlined text-tertiary" data-icon="description">description</span>
 </div>
 <h3 class="font-h3 text-h3 mb-xs font-bold">Word إلى PDF</h3>
 <p class="font-body-sm text-body-sm text-on-surface-variant">تحويل ملفات الوورد إلى صيغة PDF بدقة عالية.</p>
 </div>
-<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer" onclick="alert('هذه الميزة قيد التطوير')">
+<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer" onclick="showGenericTool('حماية PDF', 'lock')">
 <div class="w-12 h-12 bg-tertiary-fixed rounded-full flex items-center justify-center mb-sm group-hover:bg-tertiary-container transition-colors">
 <span class="material-symbols-outlined text-tertiary" data-icon="lock">lock</span>
 </div>
 <h3 class="font-h3 text-h3 mb-xs font-bold">حماية PDF</h3>
 <p class="font-body-sm text-body-sm text-on-surface-variant">تشفير ملفاتك بكلمة مرور قوية.</p>
 </div>
-<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer" onclick="alert('هذه الميزة قيد التطوير')">
+<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer" onclick="showGenericTool('تنظيم PDF', 'grid_view')">
 <div class="w-12 h-12 bg-tertiary-fixed rounded-full flex items-center justify-center mb-sm group-hover:bg-tertiary-container transition-colors">
 <span class="material-symbols-outlined text-tertiary" data-icon="grid_view">grid_view</span>
 </div>
 <h3 class="font-h3 text-h3 mb-xs font-bold">تنظيم PDF</h3>
 <p class="font-body-sm text-body-sm text-on-surface-variant">إعادة ترتيب الصفحات أو حذفها أو تدويرها.</p>
 </div>
-<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer" onclick="alert('هذه الميزة قيد التطوير')">
+<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer" onclick="showGenericTool('فك القفل', 'lock_open')">
 <div class="w-12 h-12 bg-tertiary-fixed rounded-full flex items-center justify-center mb-sm group-hover:bg-tertiary-container transition-colors">
 <span class="material-symbols-outlined text-tertiary" data-icon="lock_open">lock_open</span>
 </div>
@@ -239,7 +239,7 @@
 </div>
 </div>
 <!-- Upload State -->
-<div class="bg-white rounded-xl border-2 border-dashed border-outline-variant p-20 flex flex-col items-center justify-center gap-md transition-all drop-zone" id="upload-stage">
+<div class="bg-white rounded-xl border-2 border-dashed border-outline-variant p-20 flex flex-col items-center justify-center gap-md transition-all drop-zone cursor-pointer hover:border-primary" id="upload-stage" onclick="document.getElementById('file-input').click()">
 <div class="w-20 h-20 bg-primary-fixed rounded-full flex items-center justify-center">
 <span class="material-symbols-outlined text-4xl text-primary" data-icon="upload_file">upload_file</span>
 </div>
@@ -248,14 +248,14 @@
 <p class="text-on-surface-variant">أو انقر لاختيار ملف من جهازك</p>
 </div>
 <input accept=".pdf" class="hidden" id="file-input" onchange="handleFileUpload(event)" type="file"/>
-<button class="bg-primary text-on-primary px-lg py-sm rounded-full font-bold hover:bg-primary-container" onclick="document.getElementById('file-input').click()">اختيار ملف</button>
+<button class="bg-primary text-on-primary px-lg py-sm rounded-full font-bold hover:bg-primary-container pointer-events-none">اختيار ملف</button>
 </div>
 <!-- Loading State -->
 <div class="hidden bg-white rounded-xl border border-outline-variant p-20 flex flex-col items-center justify-center gap-md" id="loading-stage">
 <div class="loader"></div>
-<p class="font-bold text-lg">جاري معالجة المستند...</p>
+<p class="font-bold text-lg" id="loading-text">جاري معالجة المستند...</p>
 </div>
-<!-- Signature Workspace (Canvas Area) -->
+<!-- Signature Workspace -->
 <div class="hidden grid grid-cols-1 lg:grid-cols-12 gap-gutter" id="workspace-stage">
 <!-- Tool Sidebar -->
 <div class="lg:col-span-3 space-y-sm">
@@ -310,7 +310,6 @@
 <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none select-none">
 <div class="text-6xl font-black rotate-45 border-8 border-slate-900 p-md">DOCUMASTER</div>
 </div>
-<!-- Placeholder content -->
 <div class="space-y-md">
 <div class="h-8 bg-slate-100 w-2/3 rounded"></div>
 <div class="space-y-xs">
@@ -319,7 +318,6 @@
 <div class="h-4 bg-slate-50 w-3/4 rounded"></div>
 </div>
 <div class="h-48 bg-slate-50 w-full rounded border-2 border-dashed border-slate-200 flex items-center justify-center text-slate-300">نص المستند النموذجي</div>
-<!-- Active Sign Area -->
 <div class="mt-xl pt-xl border-t border-slate-200">
 <div class="flex justify-between items-end">
 <div class="space-y-sm">
@@ -341,6 +339,55 @@
 </div>
 </section>
 </div>
+<!-- Generic Tool Placeholder View -->
+<div data-view="generic-tool" id="view-generic-tool">
+<section class="bg-surface-container-low py-xl px-6 active-tool-bg min-h-screen">
+<div class="max-w-4xl mx-auto">
+<div class="flex items-center gap-sm mb-lg">
+<div class="w-10 h-10 bg-primary text-on-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined" id="generic-tool-icon">settings</span>
+</div>
+<h2 class="font-h2 text-h2 font-bold" id="generic-tool-name">الأداة</h2>
+<button class="mr-auto bg-white border border-outline px-sm py-xs rounded-lg font-label-md text-on-surface flex items-center gap-xs hover:bg-slate-50" onclick="showView('home')">
+                            العودة للرئيسية
+                        </button>
+</div>
+<div class="bg-white rounded-xl border-2 border-dashed border-outline-variant p-20 flex flex-col items-center justify-center gap-md transition-all drop-zone cursor-pointer hover:border-primary" id="generic-upload" onclick="simulateGenericProcess()">
+<div class="w-20 h-20 bg-secondary-fixed rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-secondary" data-icon="upload_file">upload_file</span>
+</div>
+<div class="text-center">
+<h3 class="text-xl font-bold mb-xs">اسحب الملفات هنا لمعالجتها</h3>
+<p class="text-on-surface-variant">يدعم الملفات حتى 100 ميجابايت</p>
+</div>
+<button class="bg-primary text-on-primary px-lg py-sm rounded-full font-bold">رفع الملفات</button>
+</div>
+<div class="hidden bg-white rounded-xl border border-outline-variant p-20 flex flex-col items-center justify-center gap-md" id="generic-loading">
+<div class="loader"></div>
+<p class="font-bold text-lg">جاري التنفيذ...</p>
+<div class="w-full max-w-xs bg-slate-200 h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full transition-all duration-[3000ms] w-0" id="generic-progress"></div>
+</div>
+</div>
+<div class="hidden bg-white rounded-xl border border-green-200 p-20 flex flex-col items-center justify-center gap-md" id="generic-success">
+<div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-green-600" data-icon="check_circle">check_circle</span>
+</div>
+<div class="text-center">
+<h3 class="text-xl font-bold mb-xs">اكتملت العملية!</h3>
+<p class="text-on-surface-variant">ملفك جاهز للتحميل الآن</p>
+</div>
+<div class="flex gap-sm">
+<button class="bg-primary text-on-primary px-lg py-sm rounded-full font-bold flex items-center gap-xs" onclick="showToast('بدء التحميل...'); setTimeout(()=&gt;showView('home'), 1000)">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+                                تحميل الملف
+                            </button>
+<button class="border border-outline px-lg py-sm rounded-full font-bold" onclick="showView('home')">الرئيسية</button>
+</div>
+</div>
+</div>
+</section>
+</div>
 </main>
 <!-- Footer -->
 <footer class="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800">
@@ -355,7 +402,7 @@
 </footer>
 <!-- FAB for quick help -->
 <div class="fixed bottom-margin left-margin">
-<button class="w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform active:scale-95" onclick="alert('خدمة المساعدة المباشرة ستتوفر قريباً')">
+<button class="w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform active:scale-95" onclick="showToast('جاري تحويلك للمساعدة...')">
 <span class="material-symbols-outlined" data-icon="chat">chat</span>
 </button>
 </div>
@@ -364,15 +411,12 @@
         let isSigned = false;
 
         function showView(viewId) {
-            // Hide all views
             document.querySelectorAll('[data-view]').forEach(view => {
                 view.classList.remove('active');
             });
-            // Show requested view
             const targetView = document.getElementById(`view-${viewId}`);
             if (targetView) targetView.classList.add('active');
 
-            // Update nav links
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.classList.remove('active');
                 if (link.getAttribute('data-nav') === viewId) {
@@ -380,19 +424,44 @@
                 }
             });
 
-            // If going back to home, reset sign tool state
             if (viewId === 'home') {
                 resetSignTool();
+                resetGenericTool();
             }
-
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        function showGenericTool(name, icon) {
+            document.getElementById('generic-tool-name').textContent = name;
+            document.getElementById('generic-tool-icon').textContent = icon;
+            showView('generic-tool');
+        }
+
         // Drag and Drop Logic
-        const dropZone = document.getElementById('upload-stage');
+        const dropZones = document.querySelectorAll('.drop-zone');
         
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, preventDefaults, false);
+        dropZones.forEach(zone => {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                zone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                zone.addEventListener(eventName, () => zone.classList.add('drop-zone--over'), false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                zone.addEventListener(eventName, () => zone.classList.remove('drop-zone--over'), false);
+            });
+
+            zone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (zone.id === 'upload-stage') {
+                    handleFiles(files);
+                } else {
+                    simulateGenericProcess();
+                }
+            });
         });
 
         function preventDefaults(e) {
@@ -400,23 +469,8 @@
             e.stopPropagation();
         }
 
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropZone.addEventListener(eventName, () => dropZone.classList.add('drop-zone--over'), false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, () => dropZone.classList.remove('drop-zone--over'), false);
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            handleFiles(files);
-        });
-
         function handleFileUpload(e) {
-            const files = e.target.files;
-            handleFiles(files);
+            handleFiles(e.target.files);
         }
 
         function handleFiles(files) {
@@ -425,27 +479,29 @@
                 document.getElementById('doc-name').textContent = file.name;
                 document.getElementById('doc-size').textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
                 
-                // Show loading state
                 document.getElementById('upload-stage').classList.add('hidden');
                 document.getElementById('loading-stage').classList.remove('hidden');
                 
-                // Simulate processing
                 setTimeout(() => {
                     document.getElementById('loading-stage').classList.add('hidden');
                     document.getElementById('workspace-stage').classList.remove('hidden');
-                }, 1500);
+                }, 1200);
             }
         }
 
         function setSignMethod(method, btn) {
             currentSignMethod = method;
-            // Update UI buttons
             document.querySelectorAll('.sign-method-btn').forEach(b => {
                 b.classList.remove('bg-primary-fixed', 'text-primary', 'border-primary-container');
                 b.classList.add('bg-white', 'text-on-surface-variant', 'border-outline-variant');
             });
             btn.classList.remove('bg-white', 'text-on-surface-variant', 'border-outline-variant');
             btn.classList.add('bg-primary-fixed', 'text-primary', 'border-primary-container');
+            
+            // If already signed, offer to update or just change visual if applicable
+            if(isSigned) {
+                showToast(`تم تبديل طريقة التوقيع إلى: ${btn.textContent.trim()}`);
+            }
         }
 
         // Signature Interaction
@@ -453,15 +509,13 @@
         const placeholderText = document.getElementById('placeholder-text');
 
         signTarget.addEventListener('click', function() {
-            if (isSigned) return;
-
             let signatureHtml = '';
             if (currentSignMethod === 'draw') {
                 signatureHtml = `<div class="w-full h-full flex items-center justify-center bg-white border border-primary rounded p-2"><svg class="w-full h-full text-slate-800" viewBox="0 0 100 40"><path d="M10,25 Q30,10 50,25 T90,15" fill="none" stroke="currentColor" stroke-width="2" /></svg></div>`;
             } else if (currentSignMethod === 'type') {
                 signatureHtml = `<div class="w-full h-full flex items-center justify-center bg-white border border-primary rounded"><span class="font-display italic text-2xl text-slate-800">توقيع المالك</span></div>`;
             } else if (currentSignMethod === 'image') {
-                signatureHtml = `<div class="w-full h-full flex items-center justify-center bg-white border border-primary rounded overflow-hidden p-2"><img src="https://api.placeholder.com/150x50" class="max-h-full" alt="توقيع"></div>`;
+                signatureHtml = `<div class="w-full h-full flex items-center justify-center bg-white border border-primary rounded overflow-hidden p-2"><img src="https://api.dicebear.com/7.x/initials/svg?seed=Sign" class="max-h-full" alt="توقيع"></div>`;
             }
 
             this.innerHTML = signatureHtml;
@@ -487,13 +541,41 @@
             resetCanvas();
         }
 
+        function simulateGenericProcess() {
+            const upload = document.getElementById('generic-upload');
+            const loading = document.getElementById('generic-loading');
+            const progress = document.getElementById('generic-progress');
+            const success = document.getElementById('generic-success');
+
+            upload.classList.add('hidden');
+            loading.classList.remove('hidden');
+            progress.style.width = '0%';
+            
+            setTimeout(() => progress.style.width = '100%', 100);
+            
+            setTimeout(() => {
+                loading.classList.add('hidden');
+                success.classList.remove('hidden');
+            }, 3200);
+        }
+
+        function resetGenericTool() {
+            document.getElementById('generic-upload').classList.remove('hidden');
+            document.getElementById('generic-loading').classList.add('hidden');
+            document.getElementById('generic-success').classList.add('hidden');
+            document.getElementById('generic-progress').style.width = '0%';
+        }
+
         function finishSigning() {
             if (!isSigned) {
-                alert('يرجى إضافة توقيع أولاً');
+                showToast('يرجى إضافة توقيع أولاً');
                 return;
             }
-            showToast('تم حفظ المستند بنجاح!');
-            setTimeout(() => showView('home'), 2000);
+            showToast('جاري حفظ التعديلات...');
+            setTimeout(() => {
+                showToast('تم حفظ المستند بنجاح!');
+                setTimeout(() => showView('home'), 1500);
+            }, 1000);
         }
 
         function showToast(message) {
