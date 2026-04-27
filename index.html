@@ -525,9 +525,33 @@ function tt(key){
   return v ?? key;
 }
 
+const TOP_NAV = [
+  {key:'popular', cat:'home'},
+  {key:'organize', cat:'organize'},
+  {key:'convert', cat:'convert'},
+  {key:'edit', cat:'edit'},
+  {key:'sign', cat:'sign'},
+  {key:'secure', cat:'secure'},
+  {key:'about', cat:'about'}
+];
+function renderTopNav(){
+  const el = document.getElementById('topNav');
+  if (!el) return;
+  el.innerHTML = TOP_NAV.map(n => `<button class="nav-btn" data-cat="${n.cat}" onclick="navCat('${n.cat}')">${tt('nav.'+n.key)}</button>`).join('');
+}
+window.navCat = (cat) => {
+  if (cat === 'about') return nav('about');
+  if (cat === 'home'){ nav('home'); return; }
+  nav('home');
+  setTimeout(() => {
+    const t = document.querySelector(`[data-section="${cat}"]`);
+    if (t) t.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 50);
+};
 function applyLang(){
   document.documentElement.lang = LANG;
   document.documentElement.dir = LANG === 'ar' ? 'rtl' : 'ltr';
+  renderTopNav();
   document.querySelectorAll('[data-i18n]').forEach(el => {
     el.textContent = tt(el.getAttribute('data-i18n'));
   });
@@ -693,8 +717,11 @@ function render(){
     const r = (location.hash.replace(/^#\//,'') || 'home');
     if (ROUTES[r]) currentRoute = r;
   }
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.route === currentRoute));
   applyLang();
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    const c = b.dataset.cat;
+    b.classList.toggle('active', (currentRoute === 'home' && c === 'home') || (currentRoute === 'about' && c === 'about'));
+  });
   const main = document.getElementById('main');
   main.innerHTML = '';
   (ROUTES[currentRoute] || renderHome)(main);
@@ -703,41 +730,70 @@ function render(){
 
 /* ================== HOME ================== */
 function renderHome(main){
+  // Popular tools (first 8 most-used) shown like screenshot
+  const popular = ['merge','split','compress','organize','sign','watermark','jpgToPdf','protect'];
   const sections = [
-    {key:'view', tools:['viewer']},
     {key:'organize', tools:['merge','split','organize','rotate','compress']},
     {key:'edit', tools:['sign','annotate','watermark']},
-    {key:'convert', tools:['jpgToPdf','pdfToJpg','extractText']},
+    {key:'convert', tools:['jpgToPdf','pdfToJpg','extractText','viewer']},
     {key:'secure', tools:['protect','unlock']}
   ];
   main.innerHTML = `
     <section class="hero">
-      <h1>${tt('home.title')}</h1>
+      <h1>${tt('home.title')}<span class="dot">.</span></h1>
       <p>${tt('home.subtitle')}</p>
     </section>
-    ${dropzone({label: tt('home.drop'), onFiles:(fs)=>{
-      window.__viewerFile = fs[0]; nav('viewer');
-    }})}
+    <div class="dropzone" id="homedz">
+      <input type="file" accept="application/pdf" style="display:none"/>
+      <div class="dropzone-icon">${svg('upload')}</div>
+      <p class="lead">${tt('home.dropTitle')}</p>
+      <p class="sub">${tt('home.dropSub')}</p>
+      <button type="button" class="pick-btn">${tt('home.pickBtn')}</button>
+    </div>
+    <section class="section">
+      <div class="section-head">
+        <h2>${tt('home.sectionPopular')}</h2>
+        <p>${tt('home.sectionPopularSub')}</p>
+      </div>
+      <div class="grid">
+        ${popular.map(t => `
+          <button class="tool" onclick="nav('${t}')">
+            <div class="tool-icon">${svg(t)}</div>
+            <h3>${tt('tools.'+t+'.name')}</h3>
+            <p>${tt('tools.'+t+'.desc')}</p>
+          </button>
+        `).join('')}
+      </div>
+    </section>
     ${sections.map(s => `
-      <section class="section">
+      <section class="section" data-section="${s.key}">
         <div class="section-head">
           <h2>${tt('home.section'+s.key.charAt(0).toUpperCase()+s.key.slice(1))}</h2>
-          <div class="rule"></div>
         </div>
         <div class="grid">
           ${s.tools.map(t => `
             <button class="tool" onclick="nav('${t}')">
               <div class="tool-icon">${svg(t)}</div>
-              <div class="tool-text">
-                <h3>${tt('tools.'+t+'.name')}</h3>
-                <p>${tt('tools.'+t+'.desc')}</p>
-              </div>
+              <h3>${tt('tools.'+t+'.name')}</h3>
+              <p>${tt('tools.'+t+'.desc')}</p>
             </button>
           `).join('')}
         </div>
       </section>
     `).join('')}
   `;
+  // Wire up the home dropzone
+  const dz = document.getElementById('homedz');
+  const inp = dz.querySelector('input');
+  const handle = (files) => {
+    const fs = [...files].filter(f => f.type === 'application/pdf' || /\.pdf$/i.test(f.name));
+    if (fs.length){ window.__viewerFile = fs[0]; nav('viewer'); }
+  };
+  dz.addEventListener('click', e => { if (e.target.tagName !== 'INPUT') inp.click(); });
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag'); handle(e.dataTransfer.files); });
+  inp.addEventListener('change', e => { handle(e.target.files); inp.value = ''; });
 }
 
 /* ================== ABOUT ================== */
