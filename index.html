@@ -7,7 +7,6 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -102,6 +101,13 @@
             background-image: radial-gradient(circle at 2px 2px, #e1e2e4 1px, transparent 0);
             background-size: 24px 24px;
         }
+        [data-view] { display: none; }
+        [data-view].active { display: block; }
+        .nav-link.active {
+            color: #2563eb;
+            border-bottom-width: 2px;
+            border-color: #2563eb;
+        }
     </style>
 </head>
 <body class="bg-background text-on-surface">
@@ -109,108 +115,117 @@
 <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm sticky top-0 z-50">
 <div class="flex flex-row-reverse justify-between items-center w-full px-6 py-3">
 <!-- Brand -->
-<div class="text-xl font-black text-slate-900 dark:text-white">أدوات PDF المحترفة</div>
+<div class="text-xl font-black text-slate-900 dark:text-white cursor-pointer" onclick="showView('home')">أدوات PDF المحترفة</div>
 <!-- Navigation Links (Desktop) -->
 <nav class="hidden md:flex flex-row-reverse gap-gutter items-center">
-<a class="text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 pb-1 font-inter text-sm font-medium" href="#">الرئيسية</a>
-<a class="text-slate-600 dark:text-slate-400 hover:text-blue-500 font-inter text-sm font-medium transition-colors" href="#">تحويل</a>
-<a class="text-slate-600 dark:text-slate-400 hover:text-blue-500 font-inter text-sm font-medium transition-colors" href="#">تعديل</a>
-<a class="text-slate-600 dark:text-slate-400 hover:text-blue-500 font-inter text-sm font-medium transition-colors" href="#">توقيع</a>
+<button class="nav-link active text-slate-600 dark:text-slate-400 hover:text-blue-500 font-inter text-sm font-medium transition-colors pb-1" data-nav="home" onclick="showView('home')">الرئيسية</button>
+<button class="nav-link text-slate-600 dark:text-slate-400 hover:text-blue-500 font-inter text-sm font-medium transition-colors pb-1">تحويل</button>
+<button class="nav-link text-slate-600 dark:text-slate-400 hover:text-blue-500 font-inter text-sm font-medium transition-colors pb-1">تعديل</button>
+<button class="nav-link text-slate-600 dark:text-slate-400 hover:text-blue-500 font-inter text-sm font-medium transition-colors pb-1" data-nav="sign" onclick="showView('sign')">توقيع</button>
 </nav>
 <!-- Trailing Actions -->
 <div class="flex flex-row-reverse items-center gap-sm">
+<!-- No Login/Sign In references as per request -->
 </div>
 </div>
 </header>
 <main class="min-h-screen">
+<!-- Home View -->
+<div class="active" data-view="home">
 <!-- Hero Section -->
 <section class="max-w-7xl mx-auto px-6 py-xl text-center">
-<h1 class="font-display text-display text-on-surface mb-xs">كل أدوات PDF التي تحتاجها في مكان واحد</h1>
+<h1 class="font-display text-4xl font-bold text-on-surface mb-xs">كل أدوات PDF التي تحتاجها في مكان واحد</h1>
 <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-lg">منصة احترافية، آمنة، وسهلة الاستخدام لإدارة مستنداتك الرقمية بكل كفاءة.</p>
 <!-- Bento Grid of Tools -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
 <!-- Tool Card: Sign -->
-<a class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-all group cursor-pointer border-t-4 border-t-primary" href="{{DATA:SCREEN:SCREEN_7}}">
+<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer border-t-4 border-t-primary" onclick="showView('sign')">
 <div class="w-12 h-12 bg-primary-fixed rounded-full flex items-center justify-center mb-sm group-hover:bg-primary-container transition-colors">
 <span class="material-symbols-outlined text-primary" data-icon="draw">draw</span>
 </div>
-<h3 class="font-h3 text-h3 mb-xs">توقيع PDF</h3>
+<h3 class="font-h3 text-h3 mb-xs font-bold">توقيع PDF</h3>
 <p class="font-body-sm text-body-sm text-on-surface-variant">أضف توقيعك الإلكتروني للمستندات بسهولة وأمان.</p>
-</a>
+</div>
 <!-- Tool Card: Merge -->
-<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-all group cursor-pointer">
+<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer">
 <div class="w-12 h-12 bg-secondary-fixed rounded-full flex items-center justify-center mb-sm group-hover:bg-secondary-container transition-colors">
 <span class="material-symbols-outlined text-secondary" data-icon="call_merge">call_merge</span>
 </div>
-<h3 class="font-h3 text-h3 mb-xs">دمج PDF</h3>
+<h3 class="font-h3 text-h3 mb-xs font-bold">دمج PDF</h3>
 <p class="font-body-sm text-body-sm text-on-surface-variant">اجمع عدة ملفات في مستند واحد مرتب.</p>
 </div>
 <!-- Tool Card: Split -->
-<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-all group cursor-pointer">
+<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer">
 <div class="w-12 h-12 bg-secondary-fixed rounded-full flex items-center justify-center mb-sm group-hover:bg-secondary-container transition-colors">
 <span class="material-symbols-outlined text-secondary" data-icon="call_split">call_split</span>
 </div>
-<h3 class="font-h3 text-h3 mb-xs">تقسيم PDF</h3>
+<h3 class="font-h3 text-h3 mb-xs font-bold">تقسيم PDF</h3>
 <p class="font-body-sm text-body-sm text-on-surface-variant">استخراج صفحات محددة أو تقسيم الملف لعدة أجزاء.</p>
 </div>
 <!-- Tool Card: Compress -->
-<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-all group cursor-pointer">
+<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer">
 <div class="w-12 h-12 bg-secondary-fixed rounded-full flex items-center justify-center mb-sm group-hover:bg-secondary-container transition-colors">
 <span class="material-symbols-outlined text-secondary" data-icon="compress">compress</span>
 </div>
-<h3 class="font-h3 text-h3 mb-xs">ضغط PDF</h3>
+<h3 class="font-h3 text-h3 mb-xs font-bold">ضغط PDF</h3>
 <p class="font-body-sm text-body-sm text-on-surface-variant">تقليل حجم الملف دون التأثير على الجودة.</p>
 </div>
 <!-- Tool Card: Word to PDF -->
-<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-all group cursor-pointer">
+<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer">
 <div class="w-12 h-12 bg-tertiary-fixed rounded-full flex items-center justify-center mb-sm group-hover:bg-tertiary-container transition-colors">
 <span class="material-symbols-outlined text-tertiary" data-icon="description">description</span>
 </div>
-<h3 class="font-h3 text-h3 mb-xs">Word إلى PDF</h3>
+<h3 class="font-h3 text-h3 mb-xs font-bold">Word إلى PDF</h3>
 <p class="font-body-sm text-body-sm text-on-surface-variant">تحويل ملفات الوورد إلى صيغة PDF بدقة عالية.</p>
 </div>
 <!-- Tool Card: Protect -->
-<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-all group cursor-pointer">
+<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer">
 <div class="w-12 h-12 bg-tertiary-fixed rounded-full flex items-center justify-center mb-sm group-hover:bg-tertiary-container transition-colors">
 <span class="material-symbols-outlined text-tertiary" data-icon="lock">lock</span>
 </div>
-<h3 class="font-h3 text-h3 mb-xs">حماية PDF</h3>
+<h3 class="font-h3 text-h3 mb-xs font-bold">حماية PDF</h3>
 <p class="font-body-sm text-body-sm text-on-surface-variant">تشفير ملفاتك بكلمة مرور قوية.</p>
 </div>
 <!-- Tool Card: Organize -->
-<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-all group cursor-pointer">
+<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer">
 <div class="w-12 h-12 bg-tertiary-fixed rounded-full flex items-center justify-center mb-sm group-hover:bg-tertiary-container transition-colors">
 <span class="material-symbols-outlined text-tertiary" data-icon="grid_view">grid_view</span>
 </div>
-<h3 class="font-h3 text-h3 mb-xs">تنظيم PDF</h3>
+<h3 class="font-h3 text-h3 mb-xs font-bold">تنظيم PDF</h3>
 <p class="font-body-sm text-body-sm text-on-surface-variant">إعادة ترتيب الصفحات أو حذفها أو تدويرها.</p>
 </div>
 <!-- Tool Card: Unlock -->
-<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-all group cursor-pointer">
+<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm hover:shadow-lg transition-all group cursor-pointer">
 <div class="w-12 h-12 bg-tertiary-fixed rounded-full flex items-center justify-center mb-sm group-hover:bg-tertiary-container transition-colors">
 <span class="material-symbols-outlined text-tertiary" data-icon="lock_open">lock_open</span>
 </div>
-<h3 class="font-h3 text-h3 mb-xs">فك القفل</h3>
+<h3 class="font-h3 text-h3 mb-xs font-bold">فك القفل</h3>
 <p class="font-body-sm text-body-sm text-on-surface-variant">إزالة كلمات المرور والقيود من ملفات PDF.</p>
 </div>
 </div>
 </section>
-<!-- Active Tool Section (Integrated Sign Tool) -->
-<section class="bg-surface-container-low py-xl px-6 active-tool-bg">
-<div class="max-w-5xl mx-auto">
+</div>
+<!-- Signing Tool View -->
+<div data-view="sign">
+<section class="bg-surface-container-low py-xl px-6 active-tool-bg min-h-screen">
+<div class="max-w-7xl mx-auto">
 <div class="flex items-center gap-sm mb-lg">
 <div class="w-10 h-10 bg-primary text-on-primary rounded-lg flex items-center justify-center">
 <span class="material-symbols-outlined" data-icon="draw">draw</span>
 </div>
 <div>
-<h2 class="font-h2 text-h2">أداة التوقيع الإلكتروني</h2>
+<h2 class="font-h2 text-h2 font-bold">أداة التوقيع الإلكتروني</h2>
 <p class="font-label-sm text-label-sm text-on-surface-variant">قم بتوقيع مستندك أو اطلب توقيعات من الآخرين</p>
 </div>
 <div class="mr-auto flex gap-xs">
+<button class="bg-white border border-outline px-sm py-xs rounded-lg font-label-md text-on-surface flex items-center gap-xs hover:bg-slate-50" onclick="showView('home')">
+<span class="material-symbols-outlined text-lg" data-icon="arrow_forward">arrow_forward</span>
+                                العودة للرئيسية
+                            </button>
 <button class="bg-white border border-outline px-sm py-xs rounded-lg font-label-md text-on-surface flex items-center gap-xs hover:bg-slate-50">
 <span class="material-symbols-outlined text-lg" data-icon="upload">upload</span>
-                            رفع ملف جديد
-                        </button>
+                                رفع ملف جديد
+                            </button>
 </div>
 </div>
 <!-- Signature Workspace -->
@@ -219,19 +234,19 @@
 <div class="lg:col-span-3 space-y-sm">
 <div class="bg-white p-sm rounded-xl border border-outline-variant shadow-sm">
 <h4 class="font-label-md text-label-md text-on-surface-variant mb-sm">أدوات التوقيع</h4>
-<div class="grid grid-cols-1 gap-xs">
-<button class="flex items-center gap-sm p-sm bg-primary-fixed text-primary rounded-lg font-label-md text-right border border-primary-container">
+<div class="grid grid-cols-1 gap-xs" id="signature-methods">
+<button class="flex items-center gap-sm p-sm bg-primary-fixed text-primary rounded-lg font-label-md text-right border border-primary-container" onclick="setSignMethod(this)">
 <span class="material-symbols-outlined" data-icon="gesture">gesture</span>
-                                    رسم التوقيع
-                                </button>
-<button class="flex items-center gap-sm p-sm bg-white text-on-surface-variant rounded-lg font-label-md text-right border border-outline-variant hover:border-primary transition-colors">
+                                        رسم التوقيع
+                                    </button>
+<button class="flex items-center gap-sm p-sm bg-white text-on-surface-variant rounded-lg font-label-md text-right border border-outline-variant hover:border-primary transition-colors" onclick="setSignMethod(this)">
 <span class="material-symbols-outlined" data-icon="text_fields">text_fields</span>
-                                    توقيع نصي
-                                </button>
-<button class="flex items-center gap-sm p-sm bg-white text-on-surface-variant rounded-lg font-label-md text-right border border-outline-variant hover:border-primary transition-colors">
+                                        توقيع نصي
+                                    </button>
+<button class="flex items-center gap-sm p-sm bg-white text-on-surface-variant rounded-lg font-label-md text-right border border-outline-variant hover:border-primary transition-colors" onclick="setSignMethod(this)">
 <span class="material-symbols-outlined" data-icon="image">image</span>
-                                    تحميل صورة
-                                </button>
+                                        تحميل صورة
+                                    </button>
 </div>
 </div>
 <div class="bg-white p-sm rounded-xl border border-outline-variant shadow-sm">
@@ -250,7 +265,7 @@
 </div>
 <!-- Canvas Area -->
 <div class="lg:col-span-9">
-<div class="bg-white rounded-xl border border-outline-variant shadow-lg overflow-hidden flex flex-col min-h-[600px]">
+<div class="bg-white rounded-xl border border-outline-variant shadow-lg overflow-hidden flex flex-col min-h-[700px]">
 <!-- Canvas Header -->
 <div class="bg-surface-container-high px-md py-sm border-b border-outline-variant flex justify-between items-center">
 <div class="flex gap-sm items-center">
@@ -260,7 +275,7 @@
 <span class="material-symbols-outlined cursor-pointer hover:text-error" data-icon="delete">delete</span>
 </div>
 <div class="font-label-md">صفحة 1 من 12</div>
-<button class="bg-primary text-on-primary px-lg py-xs rounded-full font-label-md hover:bg-primary-container shadow-md">إتمام التوقيع</button>
+<button class="bg-primary text-on-primary px-lg py-xs rounded-full font-label-md hover:bg-primary-container shadow-md transition-all active:scale-95" onclick="alert('تم حفظ المستند الموقع بنجاح!')">إتمام التوقيع</button>
 </div>
 <!-- Document Preview -->
 <div class="flex-grow bg-slate-200 p-lg flex justify-center overflow-auto relative">
@@ -282,9 +297,9 @@
 <div class="flex justify-between items-end">
 <div class="space-y-sm">
 <div class="h-4 bg-slate-50 w-32 rounded"></div>
-<div class="font-display italic text-slate-300 text-lg">التوقيع هنا...</div>
+<div class="font-display italic text-slate-300 text-lg" id="placeholder-text">التوقيع هنا...</div>
 </div>
-<div class="w-48 h-24 border-2 border-primary border-dashed rounded bg-primary/5 flex flex-col items-center justify-center group cursor-pointer">
+<div class="w-48 h-24 border-2 border-primary border-dashed rounded bg-primary/5 flex flex-col items-center justify-center group cursor-pointer transition-colors hover:bg-primary/10" id="sign-target">
 <span class="material-symbols-outlined text-primary text-3xl mb-xs" data-icon="add">add</span>
 <span class="text-xs text-primary font-bold">انقر للإضافة</span>
 </div>
@@ -298,6 +313,7 @@
 </div>
 </div>
 </section>
+</div>
 </main>
 <!-- Footer -->
 <footer class="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800">
@@ -310,10 +326,70 @@
 </div>
 </div>
 </footer>
-<!-- FAB for quick help - Only visible on main screens -->
+<!-- FAB for quick help -->
 <div class="fixed bottom-margin left-margin">
 <button class="w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform active:scale-95">
 <span class="material-symbols-outlined" data-icon="chat">chat</span>
 </button>
 </div>
+<script>
+        function showView(viewId) {
+            // Hide all views
+            document.querySelectorAll('[data-view]').forEach(view => {
+                view.classList.remove('active');
+            });
+            // Show requested view
+            const targetView = document.querySelector(`[data-view="${viewId}"]`);
+            if (targetView) targetView.classList.add('active');
+
+            // Update nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active', 'border-b-2', 'border-blue-600', 'text-blue-600');
+                link.classList.add('text-slate-600');
+                if (link.getAttribute('data-nav') === viewId) {
+                    link.classList.add('active', 'border-b-2', 'border-blue-600', 'text-blue-600');
+                    link.classList.remove('text-slate-600');
+                }
+            });
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function setSignMethod(btn) {
+            // Reset sidebar buttons
+            const container = document.getElementById('signature-methods');
+            container.querySelectorAll('button').forEach(b => {
+                b.classList.remove('bg-primary-fixed', 'text-primary', 'border-primary-container');
+                b.classList.add('bg-white', 'text-on-surface-variant', 'border-outline-variant');
+            });
+            // Highlight selected
+            btn.classList.remove('bg-white', 'text-on-surface-variant', 'border-outline-variant');
+            btn.classList.add('bg-primary-fixed', 'text-primary', 'border-primary-container');
+        }
+
+        // Interaction for the signing target
+        const signTarget = document.getElementById('sign-target');
+        const placeholderText = document.getElementById('placeholder-text');
+        
+        if (signTarget) {
+            signTarget.addEventListener('click', function() {
+                this.innerHTML = `
+                    <div class="w-full h-full flex items-center justify-center bg-white border border-primary rounded">
+                        <span class="font-display italic text-2xl text-slate-800">John Doe</span>
+                    </div>
+                `;
+                this.classList.remove('border-dashed', 'bg-primary/5');
+                placeholderText.classList.add('hidden');
+            });
+        }
+
+        // Handle tool clicks to change view
+        document.querySelectorAll('[onclick^="showView"]').forEach(el => {
+            el.addEventListener('click', (e) => {
+                const view = el.getAttribute('onclick').match(/'([^']+)'/)[1];
+                showView(view);
+            });
+        });
+    </script>
 </body></html>
