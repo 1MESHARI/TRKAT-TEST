@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>UOH PDF</title>
+<title>PDF Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -78,11 +78,12 @@
   .icon-btn:hover{background:var(--primary-soft); color:var(--primary)}
   .icon-btn svg{width:18px;height:18px}
   .lang-btn{
-    background:transparent; border:1px solid var(--border); color:var(--fg);
-    height:38px; padding:0 12px; border-radius:9px; font-weight:600; font-size:13px;
-    display:inline-flex; align-items:center; gap:6px;
+    background:var(--card); border:1.5px solid var(--primary); color:var(--primary);
+    height:38px; padding:0 14px; border-radius:9px; font-weight:700; font-size:13px;
+    display:inline-flex; align-items:center; gap:6px; cursor:pointer;
+    transition:all .15s ease;
   }
-  .lang-btn:hover{border-color:var(--primary); color:var(--primary)}
+  .lang-btn:hover{background:var(--primary); color:#fff}
 
   main{flex:1; padding:48px 22px 60px; max-width:1200px; width:100%; margin:0 auto}
 
@@ -267,11 +268,18 @@
   /* Sign / annotate canvas overlay */
   .doc-stage{position:relative; display:inline-block}
   .doc-stage canvas{display:block; background:#fff; box-shadow:0 8px 30px -8px rgba(0,0,0,.25); border-radius:4px}
-  .placement{position:absolute; pointer-events:none; transform:translate(-50%,-50%)}
-  .placement img{max-width:100%; filter:drop-shadow(0 1px 1px rgba(0,0,0,.15))}
-  .placement.text{font-weight:600; font-size:13px; color:#1e1b4b; background:rgba(255,255,255,.85); padding:2px 6px; border-radius:4px; white-space:nowrap}
-  .placement.highlight{background:rgba(250,204,21,.45); border-radius:2px}
-  .placement.stamp{font-weight:800; font-size:14px; padding:5px 14px; border:2.5px solid; border-radius:6px; text-transform:uppercase; letter-spacing:.05em; background:rgba(255,255,255,.6)}
+  .placement{position:absolute; transform:translate(-50%,-50%); cursor:move; user-select:none; touch-action:none}
+  .placement img{max-width:100%; display:block; pointer-events:none; filter:drop-shadow(0 1px 1px rgba(0,0,0,.15))}
+  .placement.text{font-weight:600; color:#1e1b4b; background:rgba(255,255,255,.9); padding:3px 8px; border-radius:4px; white-space:nowrap; line-height:1.2}
+  .placement.highlight{background:rgba(250,204,21,.45); border-radius:2px; transform:translate(0,-50%)}
+  .placement.stamp{font-weight:800; padding:5px 14px; border:2.5px solid; border-radius:6px; text-transform:uppercase; letter-spacing:.05em; background:rgba(255,255,255,.6); white-space:nowrap}
+  .placement.selected{outline:2px dashed #2563eb; outline-offset:2px; z-index:10}
+  .placement .ph-handle{position:absolute; width:14px; height:14px; background:#2563eb; border:2px solid #fff; border-radius:50%; box-shadow:0 1px 3px rgba(0,0,0,.3); pointer-events:auto; opacity:0; transition:opacity .15s}
+  .placement.selected .ph-handle{opacity:1}
+  .placement .ph-handle.br{right:-9px; bottom:-9px; cursor:nwse-resize}
+  .placement .ph-handle.del{right:-9px; top:-9px; cursor:pointer; background:#dc2626; display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:bold; line-height:1; width:18px; height:18px}
+  .placement.text.editing{cursor:text}
+  .placement.text input{font:inherit; color:inherit; background:transparent; border:none; outline:none; padding:0; margin:0; min-width:60px; width:auto}
 
   .signature-pad{
     background:#fff; border:1px solid var(--border); border-radius:9px; height:160px;
@@ -332,8 +340,87 @@
     background:transparent; cursor:pointer;
   }
 
+  /* Trust badges row */
+  .badges{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:14px; margin:30px auto 0; max-width:960px;
+  }
+  .badge{
+    display:flex; gap:12px; align-items:flex-start;
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:14px 16px;
+  }
+  .badge .ico{
+    width:36px;height:36px;border-radius:9px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--primary-soft); color:var(--primary);
+  }
+  .badge .ico svg{width:18px;height:18px}
+  .badge h4{margin:0 0 2px; font-size:14px; font-weight:700; color:var(--fg)}
+  .badge p{margin:0; font-size:12.5px; color:var(--muted); line-height:1.45}
+
+  /* "How it works" steps */
+  .how-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:20px; max-width:1000px; margin:0 auto;
+  }
+  .how-step{
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:24px 22px; text-align:center; position:relative;
+  }
+  .how-step .num{
+    width:42px;height:42px;border-radius:50%;
+    background:var(--primary); color:#fff;
+    display:inline-flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:18px; margin-bottom:14px;
+  }
+  .how-step h3{margin:0 0 8px; font-size:17px; font-weight:700; color:var(--fg)}
+  .how-step p{margin:0; font-size:14px; color:var(--muted); line-height:1.55}
+
+  /* FAQ accordion */
+  .faq{max-width:780px; margin:0 auto}
+  .faq-item{
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    margin-bottom:10px; overflow:hidden;
+  }
+  .faq-q{
+    width:100%; background:none; border:0; cursor:pointer;
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+    padding:16px 18px; font-size:15px; font-weight:600; color:var(--fg); text-align:start;
+  }
+  .faq-q .chev{transition:transform .2s; flex-shrink:0; color:var(--muted)}
+  .faq-q .chev svg{width:18px;height:18px}
+  .faq-item.open .faq-q .chev{transform:rotate(180deg); color:var(--primary)}
+  .faq-a{
+    max-height:0; overflow:hidden; transition:max-height .25s ease;
+    color:var(--muted); font-size:14px; line-height:1.6; padding:0 18px;
+  }
+  .faq-item.open .faq-a{max-height:300px; padding:0 18px 16px}
+
   /* Footer */
-  footer{padding:24px; text-align:center; color:var(--muted); font-size:13px; border-top:1px solid var(--border); margin-top:40px}
+  footer{
+    margin-top:80px; padding:36px 22px 24px;
+    border-top:1px solid var(--border); background:var(--card);
+    color:var(--muted); font-size:13px;
+  }
+  .footer-inner{
+    max-width:1100px; margin:0 auto;
+    display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:30px;
+  }
+  .footer-brand{display:flex; flex-direction:column; gap:10px}
+  .footer-brand .b{display:flex; align-items:center; gap:10px; color:var(--fg); font-weight:800; font-size:16px}
+  .footer-brand .b svg{width:22px;height:22px;color:var(--primary)}
+  .footer-brand p{margin:0; line-height:1.55; max-width:340px}
+  .footer-col h5{margin:0 0 12px; font-size:13px; font-weight:700; color:var(--fg); text-transform:uppercase; letter-spacing:.04em}
+  .footer-col a{display:block; color:var(--muted); text-decoration:none; padding:5px 0; font-size:13.5px; cursor:pointer; background:none; border:0; text-align:start; font:inherit}
+  .footer-col a:hover{color:var(--primary)}
+  .footer-bottom{
+    max-width:1100px; margin:24px auto 0; padding-top:16px;
+    border-top:1px solid var(--border); text-align:center; font-size:12.5px;
+  }
+  @media (max-width:720px){
+    .footer-inner{grid-template-columns:1fr; gap:24px}
+  }
 
   /* Responsive */
   @media (max-width:720px){
@@ -353,7 +440,7 @@
   <header class="header">
     <div class="brand" onclick="nav('home')" data-i18n-title="appName">
       <div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-      <span data-i18n="appName">UOH PDF</span>
+      <span data-i18n="appName">PDF Studio</span>
     </div>
     <nav class="nav" id="topNav"></nav>
     <div class="header-right">
@@ -367,14 +454,12 @@
     </div>
   </header>
   <main id="main"></main>
-  <footer>
-    <span data-i18n="appName">UOH PDF</span>  ·  <span data-i18n="footer.tag"></span>
-  </footer>
+  <footer id="appFooter"></footer>
 </div>
 <div class="toast-wrap" id="toasts"></div>
 
 <script type="module">
-import { PDFDocument, StandardFonts, rgb, degrees } from 'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm';
+import { PDFDocument, StandardFonts, rgb, degrees, LineCapStyle } from 'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm';
 import * as pdfjsLib from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.min.mjs';
 import JSZip from 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm';
 import SignaturePad from 'https://cdn.jsdelivr.net/npm/signature_pad@4.2.0/+esm';
@@ -384,9 +469,18 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dis
 /* ================== I18N ================== */
 const I18N = {
   ar: {
-    appName:"UOH PDF",
+    appName:"بي دي إف ستوديو",
     nav:{popular:"PDF الشائعة", organize:"تنظيم PDF", convert:"تحويل PDF", edit:"تعديل", sign:"توقيع", secure:"أمان", about:"عن التطبيق"},
-    footer:{tag:"كل ملفاتك تبقى في متصفحك."},
+    footer:{
+      tag:"كل ملفاتك تبقى في متصفحك.",
+      copyright:"بي دي إف ستوديو — أداة مجانية مفتوحة، تعمل بالكامل في المتصفح.",
+      tools:"الأدوات",
+      info:"معلومات",
+      privacy:"الخصوصية",
+      about:"عن التطبيق",
+      faq:"الأسئلة الشائعة",
+      offline:"يعمل بدون إنترنت"
+    },
     home:{
       title:"الحل الكامل لملفات PDF",
       subtitle:"أدوات آمنة وسريعة ومجانية لإدارة مستنداتك — كل شيء يحدث في متصفحك مباشرة بدون رفع.",
@@ -400,6 +494,38 @@ const I18N = {
       sectionEdit:"تحرير المستندات",
       sectionConvert:"تحويل الصيغ",
       sectionSecure:"الأمان والخصوصية"
+    },
+    badges:{
+      private:{title:"خصوصية كاملة", body:"ملفاتك لا تغادر متصفحك أبدًا."},
+      fast:{title:"سرعة فائقة", body:"معالجة فورية بدون انتظار رفع."},
+      offline:{title:"بدون إنترنت", body:"يعمل بمجرد تحميل الصفحة."},
+      free:{title:"مجاني تمامًا", body:"بدون اشتراك ولا حدود يومية."}
+    },
+    how:{
+      title:"كيف يعمل بي دي إف ستوديو؟",
+      subtitle:"ثلاث خطوات بسيطة لإنجاز أي عملية على ملفاتك",
+      s1Title:"اختر الأداة",
+      s1Body:"حدد ما تريد فعله من قائمة الأدوات الواضحة في الأعلى أو من البطاقات بالأسفل.",
+      s2Title:"ارفع ملفك",
+      s2Body:"اسحب وأسقط ملف PDF أو الصورة، أو اختره من جهازك. الملف يُعالج محليًا.",
+      s3Title:"حمّل النتيجة",
+      s3Body:"اضغط زر التنزيل، وستحصل على ملفك الجديد فورًا، دون أي بصمة على أي خادم."
+    },
+    faq:{
+      title:"الأسئلة الشائعة",
+      subtitle:"إجابات سريعة على أكثر ما يُسأل",
+      q1:"هل يتم رفع ملفاتي إلى الإنترنت؟",
+      a1:"لا. كل أداة هنا تعمل بالكامل في متصفحك باستخدام جافاسكربت محلية. لا يوجد خادم يستلم ملفاتك أو يخزنها.",
+      q2:"هل بي دي إف ستوديو مجاني تمامًا؟",
+      a2:"نعم، كل الأدوات مجانية بدون قيود يومية، بدون تسجيل، وبدون اشتراك.",
+      q3:"ما حدود حجم الملف؟",
+      a3:"لأن المعالجة تحدث في المتصفح، يعتمد الحد على ذاكرة جهازك. الملفات حتى عدة مئات من الميغابايت تعمل عادةً بسلاسة.",
+      q4:"هل يدعم الموقع اللغة العربية؟",
+      a4:"نعم، الواجهة بالعربية والإنجليزية، واستخراج النص يعالج الأحرف العربية والاتجاه RTL تلقائيًا.",
+      q5:"هل أحتاج اتصال إنترنت؟",
+      a5:"تحتاجه فقط لفتح الصفحة أول مرة. بعدها يمكنك استخدام جميع الأدوات بدون اتصال.",
+      q6:"هل يمكنني حماية ملف PDF بكلمة مرور؟",
+      a6:"حاليًا أداة الحماية معطّلة لأن مكتبات تشفير PDF داخل المتصفح غير موثوقة بما يكفي. أداة فك الحماية تعمل لإزالة كلمات المرور من ملفاتك."
     },
     actions:{
       browse:"اختر ملفًا أو أفلته هنا",
@@ -429,7 +555,9 @@ const I18N = {
       unlock:{name:"فك الحماية", desc:"أزل كلمة المرور من ملف تملكه"},
       jpgToPdf:{name:"صور إلى PDF", desc:"حوّل الصور إلى ملف PDF"},
       pdfToJpg:{name:"PDF إلى JPG", desc:"صدّر كل صفحة كصورة"},
-      extractText:{name:"استخراج النص", desc:"استخرج كل النصوص من PDF"}
+      extractText:{name:"استخراج النص", desc:"استخرج كل النصوص من PDF"},
+      crop:{name:"اقتصاص الصفحات", desc:"حدد منطقة وقصّ الهوامش"},
+      ocr:{name:"OCR (تحويل الصور لنص)", desc:"استخرج النص من PDF ممسوح ضوئيًا"}
     },
     viewer:{title:"عارض PDF", subtitle:"تصفّح صفحات ملفك مع المصغرات والتكبير"},
     merge:{title:"دمج ملفات PDF", subtitle:"اجمع عدة ملفات في مستند واحد بترتيب تختاره", output:"اسم الملف الناتج", action:"دمج وتنزيل", needTwo:"أضف ملفين على الأقل"},
@@ -437,21 +565,32 @@ const I18N = {
     compress:{title:"ضغط PDF", subtitle:"قلّل حجم الملف مع الحفاظ على الجودة", quality:"الجودة", low:"منخفضة (أصغر حجم)", medium:"متوسطة (موصى بها)", high:"عالية (أفضل جودة)", before:"قبل", after:"بعد", saved:"وفّرت", action:"ضغط الملف"},
     organize:{title:"تنظيم الصفحات", subtitle:"أعد الترتيب أو دوّر أو احذف الصفحات", action:"حفظ وتنزيل", noPages:"لا توجد صفحات"},
     rotate:{title:"تدوير الصفحات", subtitle:"أدر الصفحات للاتجاه الصحيح", all:"كل الصفحات", selected:"المحددة فقط", action:"تطبيق التدوير"},
-    watermark:{title:"إضافة علامة مائية", subtitle:"اطبع نصًا على كل صفحات الملف", text:"النص", size:"حجم الخط", color:"اللون", opacity:"الشفافية", angle:"الزاوية", position:"الموضع", center:"وسط", topLeft:"أعلى يسار", topRight:"أعلى يمين", bottomLeft:"أسفل يسار", bottomRight:"أسفل يمين", action:"إضافة وتنزيل"},
+    watermark:{title:"إضافة علامة مائية", subtitle:"اطبع نصًا على كل صفحات الملف", text:"النص", size:"حجم الخط", color:"اللون", opacity:"الشفافية", angle:"الزاوية", position:"الموضع", center:"وسط", topLeft:"أعلى يسار", topRight:"أعلى يمين", bottomLeft:"أسفل يسار", bottomRight:"أسفل يمين", tile:"تكرار في كل الصفحة", spacing:"المسافة بين التكرار", action:"إضافة وتنزيل"},
     sign:{title:"توقيع PDF", subtitle:"ارسم أو اكتب أو ارفع توقيعك ثم ضعه على الصفحة", draw:"ارسم", type:"اكتب", upload:"ارفع", typedName:"اكتب اسمك", clearSig:"مسح", apply:"اعتماد التوقيع", placeHint:"اضغط على الصفحة لوضع توقيعك", noSig:"اعتمد توقيعًا أولًا", action:"حفظ الملف الموقّع"},
-    annotate:{title:"تعليقات على PDF", subtitle:"أضف نصوصًا وتظليلات وأختامًا", text:"نص", highlight:"تظليل", stamp:"ختم", textValue:"النص", stampType:"نوع الختم", approved:"موافق", rejected:"مرفوض", confidential:"سري", draft:"مسودة", action:"حفظ الملف", clickHint:"اضغط على الصفحة لإضافة"},
+    annotate:{title:"تعديل وتعليقات", subtitle:"أضف نصًا أو تظليلًا أو ختمًا أو ارسم بحرية، وحرّك أي عنصر بسحبه أو غيّر حجمه من الزاوية", text:"نص", highlight:"تظليل", stamp:"ختم", draw:"رسم حر", textValue:"النص", textSize:"حجم الخط", textColor:"لون النص", hlColor:"لون التظليل", stampType:"نوع الختم", approved:"موافق", rejected:"مرفوض", confidential:"سري", draft:"مسودة", action:"حفظ الملف", clickHint:"اضغط على الصفحة لإضافة، ثم اسحب لتحريك أو غيّر الحجم من الزاوية", editText:"عدّل النص", editHint:"انقر مرتين على النص لتعديله", drawHint:"اضغط واسحب الفأرة على الصفحة لترسم. كل ضغطة تبدأ خطًا جديدًا.", penColor:"لون القلم", penSize:"حجم القلم", clearDraw:"مسح الرسم"},
+    crop:{title:"اقتصاص الصفحات", subtitle:"حدد منطقة الاقتصاص بسحب المؤشر، وستُطبق على الصفحات المختارة", area:"منطقة الاقتصاص", apply:"تطبيق على", currentPage:"الصفحة الحالية فقط", allPages:"كل الصفحات", reset:"إعادة الضبط", action:"اقتصاص وتنزيل", noArea:"حدد منطقة الاقتصاص أولًا بسحب المؤشر على المعاينة"},
+    ocr:{title:"OCR — استخراج نص الصور", subtitle:"اقرأ النص من ملفات PDF الممسوحة ضوئيًا (يدعم العربية والإنجليزية). كل المعالجة محلية في متصفحك.", language:"لغة النص في الملف", langAr:"عربي", langEn:"إنجليزي", langArEn:"عربي + إنجليزي", pages:"الصفحات", action:"بدء OCR", loading:"جارٍ تحميل محرك OCR…", processing:"معالجة الصفحة", copy:"نسخ الكل", download:"تنزيل .txt", copied:"تم النسخ", note:"OCR يستغرق وقتًا أطول للملفات الكبيرة لأن كل صفحة تُحلَّل كصورة."},
     protect:{title:"حماية PDF", subtitle:"أضف كلمة مرور للملف", password:"كلمة المرور", confirm:"تأكيد كلمة المرور", strength:"القوة", weak:"ضعيفة", fair:"مقبولة", strong:"قوية", excellent:"ممتازة", mismatch:"كلمتا المرور غير متطابقتين", action:"حماية وتنزيل", limit:"تشفير PDF بالمتصفح غير مدعوم بشكل آمن من المكتبات الحالية. الميزة غير مفعّلة. لحماية مستنداتك يمكنك ضغطها بكلمة مرور باستخدام أداة ضغط خارجية، أو استخدام أداة فك الحماية لإزالة كلمات المرور من ملفاتك."},
     unlock:{title:"فك حماية PDF", subtitle:"أزل كلمة المرور من ملف تملكه", password:"كلمة مرور الملف", action:"فك الحماية وتنزيل", wrong:"كلمة مرور خاطئة"},
     jpgToPdf:{title:"صور إلى PDF", subtitle:"حوّل JPG و PNG و WebP إلى ملف PDF واحد", pageSize:"حجم الصفحة", orientation:"الاتجاه", portrait:"عمودي", landscape:"أفقي", action:"إنشاء PDF"},
     pdfToJpg:{title:"PDF إلى JPG", subtitle:"صدّر كل صفحة كصورة JPG", quality:"جودة الصورة", action:"تحويل وتنزيل ZIP"},
     extractText:{title:"استخراج النص", subtitle:"استخرج كل النصوص من ملف PDF", copy:"نسخ الكل", download:"تنزيل .txt", copied:"تم النسخ", empty:"لا يوجد نص قابل للاستخراج"},
-    about:{title:"ملفاتك. على جهازك.", lead:"UOH PDF يعمل بالكامل في متصفحك. لا يُرفع أي ملف لأي خادم.", privacy:"الخصوصية", privacyBody:"كل أداة هنا تستخدم جافاسكربت محلية لقراءة وإعادة كتابة ملفاتك. لا توجد خدمة خلفية تلمس بياناتك.", open:"تقنيات مفتوحة", openBody:"مبني على pdf.js من موزيلا و pdf-lib — التقنية ذاتها التي تستخدمها المتصفحات.", offline:"يعمل بدون إنترنت", offlineBody:"بمجرد فتح الصفحة يمكنك العمل بدون اتصال."},
+    about:{title:"ملفاتك. على جهازك.", lead:"بي دي إف ستوديو يعمل بالكامل في متصفحك. لا يُرفع أي ملف لأي خادم.", privacy:"الخصوصية", privacyBody:"كل أداة هنا تستخدم جافاسكربت محلية لقراءة وإعادة كتابة ملفاتك. لا توجد خدمة خلفية تلمس بياناتك.", open:"تقنيات مفتوحة", openBody:"مبني على pdf.js من موزيلا و pdf-lib — التقنية ذاتها التي تستخدمها المتصفحات.", offline:"يعمل بدون إنترنت", offlineBody:"بمجرد فتح الصفحة يمكنك العمل بدون اتصال."},
     errors:{invalid:"الملف لا يبدو PDF صالحًا", generic:"حدث خطأ. حاول مرة أخرى.", noText:"لم يتم العثور على نص"}
   },
   en: {
-    appName:"UOH PDF",
+    appName:"PDF Studio",
     nav:{popular:"Popular PDF", organize:"Organize PDF", convert:"Convert PDF", edit:"Edit", sign:"Sign", secure:"Security", about:"About"},
-    footer:{tag:"Your files never leave your browser."},
+    footer:{
+      tag:"Your files never leave your browser.",
+      copyright:"PDF Studio — a free, open tool that runs entirely in your browser.",
+      tools:"Tools",
+      info:"Info",
+      privacy:"Privacy",
+      about:"About",
+      faq:"FAQ",
+      offline:"Works offline"
+    },
     home:{
       title:"The Complete PDF Solution",
       subtitle:"Safe, fast, and free tools to manage your documents — everything runs in your browser, with no uploads.",
@@ -465,6 +604,38 @@ const I18N = {
       sectionEdit:"Edit Documents",
       sectionConvert:"Convert Formats",
       sectionSecure:"Security & Privacy"
+    },
+    badges:{
+      private:{title:"Fully Private", body:"Your files never leave your browser."},
+      fast:{title:"Lightning Fast", body:"Instant processing — no upload wait."},
+      offline:{title:"Works Offline", body:"Once loaded, no connection needed."},
+      free:{title:"100% Free", body:"No signup, no daily limits."}
+    },
+    how:{
+      title:"How PDF Studio Works",
+      subtitle:"Three simple steps to get any job done",
+      s1Title:"Pick a tool",
+      s1Body:"Choose what you want to do from the top menu or the tool cards below.",
+      s2Title:"Upload your file",
+      s2Body:"Drag and drop your PDF or image, or pick it from your device. Files are processed locally.",
+      s3Title:"Download the result",
+      s3Body:"Click download to get your new file instantly — without ever touching a server."
+    },
+    faq:{
+      title:"Frequently Asked Questions",
+      subtitle:"Quick answers to the things people ask the most",
+      q1:"Are my files uploaded anywhere?",
+      a1:"No. Every tool here runs entirely in your browser using local JavaScript. No server ever receives or stores your files.",
+      q2:"Is PDF Studio really free?",
+      a2:"Yes — every tool is free with no daily limits, no signup, and no subscription.",
+      q3:"What's the file size limit?",
+      a3:"Since processing happens in your browser, the limit depends on your device's memory. Files up to a few hundred MB usually work smoothly.",
+      q4:"Does it support Arabic?",
+      a4:"Yes. The interface is bilingual (Arabic + English) and text extraction handles Arabic characters and RTL direction automatically.",
+      q5:"Do I need an internet connection?",
+      a5:"Only the first time you load the page. After that, every tool works offline.",
+      q6:"Can I password-protect a PDF?",
+      a6:"For now the protect tool is disabled because in-browser PDF encryption libraries are not trustworthy enough. The unlock tool does work to remove passwords from your own files."
     },
     actions:{
       browse:"Pick a file or drop it here",
@@ -494,7 +665,9 @@ const I18N = {
       unlock:{name:"Unlock", desc:"Remove password from your PDF"},
       jpgToPdf:{name:"Images to PDF", desc:"Convert images to one PDF"},
       pdfToJpg:{name:"PDF to JPG", desc:"Export each page as an image"},
-      extractText:{name:"Extract Text", desc:"Pull all text out of a PDF"}
+      extractText:{name:"Extract Text", desc:"Pull all text out of a PDF"},
+      crop:{name:"Crop Pages", desc:"Trim margins from page area"},
+      ocr:{name:"OCR (image to text)", desc:"Recognize text from a scanned PDF"}
     },
     viewer:{title:"PDF Viewer", subtitle:"Browse pages with thumbnails and zoom"},
     merge:{title:"Merge PDFs", subtitle:"Combine PDFs into one document in your chosen order", output:"Output filename", action:"Merge & Download", needTwo:"Add at least two PDFs"},
@@ -502,15 +675,17 @@ const I18N = {
     compress:{title:"Compress PDF", subtitle:"Shrink file size while keeping quality", quality:"Quality", low:"Low (smallest)", medium:"Medium (recommended)", high:"High (best quality)", before:"Before", after:"After", saved:"Saved", action:"Compress"},
     organize:{title:"Organize Pages", subtitle:"Reorder, rotate, or delete pages", action:"Save & Download", noPages:"No pages"},
     rotate:{title:"Rotate Pages", subtitle:"Spin pages to the right orientation", all:"All pages", selected:"Selected only", action:"Apply rotation"},
-    watermark:{title:"Add Watermark", subtitle:"Stamp text across every page", text:"Text", size:"Font size", color:"Color", opacity:"Opacity", angle:"Angle", position:"Position", center:"Center", topLeft:"Top left", topRight:"Top right", bottomLeft:"Bottom left", bottomRight:"Bottom right", action:"Apply & Download"},
+    watermark:{title:"Add Watermark", subtitle:"Stamp text across every page", text:"Text", size:"Font size", color:"Color", opacity:"Opacity", angle:"Angle", position:"Position", center:"Center", topLeft:"Top left", topRight:"Top right", bottomLeft:"Bottom left", bottomRight:"Bottom right", tile:"Tile across the whole page", spacing:"Spacing between tiles", action:"Apply & Download"},
     sign:{title:"Sign PDF", subtitle:"Draw, type, or upload your signature, then place it on the page", draw:"Draw", type:"Type", upload:"Upload", typedName:"Type your name", clearSig:"Clear", apply:"Use signature", placeHint:"Click on the page to place your signature", noSig:"Create a signature first", action:"Save Signed PDF"},
-    annotate:{title:"Annotate PDF", subtitle:"Add text, highlights, and stamps", text:"Text", highlight:"Highlight", stamp:"Stamp", textValue:"Text", stampType:"Stamp type", approved:"APPROVED", rejected:"REJECTED", confidential:"CONFIDENTIAL", draft:"DRAFT", action:"Save Annotated", clickHint:"Click on the page to add"},
+    annotate:{title:"Edit & Annotate", subtitle:"Add text, highlight, stamp, or draw freely. Drag any element to move it, or grab the corner handle to resize.", text:"Text", highlight:"Highlight", stamp:"Stamp", draw:"Free draw", textValue:"Text", textSize:"Font size", textColor:"Text color", hlColor:"Highlight color", stampType:"Stamp type", approved:"APPROVED", rejected:"REJECTED", confidential:"CONFIDENTIAL", draft:"DRAFT", action:"Save File", clickHint:"Click the page to add. Drag to move, drag the corner to resize.", editText:"Edit text", editHint:"Double-click any text to edit it", drawHint:"Click and drag on the page to draw. Each press starts a new stroke.", penColor:"Pen color", penSize:"Pen thickness", clearDraw:"Clear drawing"},
+    crop:{title:"Crop Pages", subtitle:"Drag on the preview to mark a crop area, then apply it to selected pages", area:"Crop area", apply:"Apply to", currentPage:"Current page only", allPages:"All pages", reset:"Reset", action:"Crop & Download", noArea:"Drag on the preview to define a crop area first"},
+    ocr:{title:"OCR — Text from Images", subtitle:"Recognize text from scanned PDFs (Arabic + English supported). All processing is local in your browser.", language:"Language of the document", langAr:"Arabic", langEn:"English", langArEn:"Arabic + English", pages:"Pages", action:"Run OCR", loading:"Loading OCR engine…", processing:"Processing page", copy:"Copy all", download:"Download .txt", copied:"Copied", note:"OCR can take longer on big files because every page is analyzed as an image."},
     protect:{title:"Protect PDF", subtitle:"Add a password to your PDF", password:"Password", confirm:"Confirm password", strength:"Strength", weak:"Weak", fair:"Fair", strong:"Strong", excellent:"Excellent", mismatch:"Passwords do not match", action:"Protect & Download", limit:"PDF encryption is not safely supported by current browser libraries. This action is disabled. To protect a document you can zip it with a password using a desktop tool, or use the Unlock tool to remove existing PDF passwords."},
     unlock:{title:"Unlock PDF", subtitle:"Remove a password from a PDF you own", password:"PDF password", action:"Unlock & Download", wrong:"Wrong password"},
     jpgToPdf:{title:"Images to PDF", subtitle:"Convert JPG, PNG, or WebP to a single PDF", pageSize:"Page size", orientation:"Orientation", portrait:"Portrait", landscape:"Landscape", action:"Create PDF"},
     pdfToJpg:{title:"PDF to JPG", subtitle:"Export each page as a JPG image", quality:"Image quality", action:"Convert & Download ZIP"},
     extractText:{title:"Extract Text", subtitle:"Pull all the text out of a PDF", copy:"Copy all", download:"Download .txt", copied:"Copied", empty:"No extractable text"},
-    about:{title:"Your files. Your computer.", lead:"UOH PDF runs entirely in your browser. No file is ever uploaded to any server.", privacy:"Privacy", privacyBody:"Every tool here uses local JavaScript to read and rewrite your PDFs. There is no backend that touches your data.", open:"Open Foundations", openBody:"Built on Mozilla's pdf.js and pdf-lib — the same technology browsers trust.", offline:"Works Offline", offlineBody:"Once the page loads, you can keep using it without an internet connection."},
+    about:{title:"Your files. Your computer.", lead:"PDF Studio runs entirely in your browser. No file is ever uploaded to any server.", privacy:"Privacy", privacyBody:"Every tool here uses local JavaScript to read and rewrite your PDFs. There is no backend that touches your data.", open:"Open Foundations", openBody:"Built on Mozilla's pdf.js and pdf-lib — the same technology browsers trust.", offline:"Works Offline", offlineBody:"Once the page loads, you can keep using it without an internet connection."},
     errors:{invalid:"That doesn't look like a valid PDF", generic:"Something went wrong. Please try again.", noText:"No text was found"}
   }
 };
@@ -591,6 +766,13 @@ const ICONS = {
   jpgToPdf:'<rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/>',
   pdfToJpg:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="10" cy="13" r="2"/><path d="m20 17-1.6-1.6a2 2 0 0 0-2.8 0L9 22"/>',
   extractText:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/>',
+  crop:'<path d="M6.13 1 6 16a2 2 0 0 0 2 2h15"/><path d="M1 6.13 16 6a2 2 0 0 1 2 2v15"/>',
+  ocr:'<path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/><path d="M7 8h6"/><path d="M7 16h4"/>',
+  draw:'<path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/>',
+  shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>',
+  bolt:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  cloudOff:'<path d="M2 2l20 20"/><path d="M5.6 5.6A6 6 0 0 0 12 14h7a4 4 0 0 0 1.4-7.7"/><path d="M9 14h11"/>',
+  chevDown:'<polyline points="6 9 12 15 18 9"/>',
   upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>',
   download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
   trash:'<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
@@ -697,7 +879,9 @@ const ROUTES = {
   unlock: renderUnlock,
   jpgToPdf: renderJpgToPdf,
   pdfToJpg: renderPdfToJpg,
-  extractText: renderExtractText
+  extractText: renderExtractText,
+  crop: renderCrop,
+  ocr: renderOcr
 };
 let currentRoute = 'home';
 let routeState = null;
@@ -725,19 +909,59 @@ function render(){
   const main = document.getElementById('main');
   main.innerHTML = '';
   (ROUTES[currentRoute] || renderHome)(main);
+  renderFooter();
   applyLang();
+}
+function renderFooter(){
+  const ft = document.getElementById('appFooter');
+  if (!ft) return;
+  ft.innerHTML = `
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="b">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>${tt('appName')}</span>
+        </div>
+        <p>${tt('footer.copyright')}</p>
+      </div>
+      <div class="footer-col">
+        <h5>${tt('footer.tools')}</h5>
+        <a onclick="nav('merge')">${tt('tools.merge.name')}</a>
+        <a onclick="nav('split')">${tt('tools.split.name')}</a>
+        <a onclick="nav('compress')">${tt('tools.compress.name')}</a>
+        <a onclick="nav('sign')">${tt('tools.sign.name')}</a>
+        <a onclick="nav('annotate')">${tt('tools.annotate.name')}</a>
+        <a onclick="nav('ocr')">${tt('tools.ocr.name')}</a>
+      </div>
+      <div class="footer-col">
+        <h5>${tt('footer.info')}</h5>
+        <a onclick="nav('about')">${tt('footer.about')}</a>
+        <a onclick="nav('home'); setTimeout(()=>{const f=document.getElementById('faqSection'); if(f)f.scrollIntoView({behavior:'smooth'});},80)">${tt('footer.faq')}</a>
+        <a onclick="nav('home'); setTimeout(()=>{const f=document.getElementById('howSection'); if(f)f.scrollIntoView({behavior:'smooth'});},80)">${tt('how.title')}</a>
+        <a>${tt('footer.offline')}</a>
+      </div>
+    </div>
+    <div class="footer-bottom">${tt('footer.tag')}</div>
+  `;
 }
 
 /* ================== HOME ================== */
 function renderHome(main){
-  // Popular tools (first 8 most-used) shown like screenshot
-  const popular = ['merge','split','compress','organize','sign','watermark','jpgToPdf','protect'];
+  // Popular tools shown like iLovePDF
+  const popular = ['merge','split','compress','organize','sign','watermark','annotate','ocr'];
   const sections = [
-    {key:'organize', tools:['merge','split','organize','rotate','compress']},
+    {key:'organize', tools:['merge','split','organize','rotate','compress','crop']},
     {key:'edit', tools:['sign','annotate','watermark']},
-    {key:'convert', tools:['jpgToPdf','pdfToJpg','extractText','viewer']},
+    {key:'convert', tools:['jpgToPdf','pdfToJpg','extractText','ocr','viewer']},
     {key:'secure', tools:['protect','unlock']}
   ];
+  const badges = [
+    {key:'private', icon:'shield'},
+    {key:'fast', icon:'bolt'},
+    {key:'offline', icon:'cloudOff'},
+    {key:'free', icon:'unlock'}
+  ];
+  const faqKeys = [1,2,3,4,5,6];
   main.innerHTML = `
     <section class="hero">
       <h1>${tt('home.title')}<span class="dot">.</span></h1>
@@ -749,6 +973,17 @@ function renderHome(main){
       <p class="lead">${tt('home.dropTitle')}</p>
       <p class="sub">${tt('home.dropSub')}</p>
       <button type="button" class="pick-btn">${tt('home.pickBtn')}</button>
+    </div>
+    <div class="badges">
+      ${badges.map(b => `
+        <div class="badge">
+          <div class="ico">${svg(b.icon)}</div>
+          <div>
+            <h4>${tt('badges.'+b.key+'.title')}</h4>
+            <p>${tt('badges.'+b.key+'.body')}</p>
+          </div>
+        </div>
+      `).join('')}
     </div>
     <section class="section">
       <div class="section-head">
@@ -781,13 +1016,50 @@ function renderHome(main){
         </div>
       </section>
     `).join('')}
+    <section class="section" id="howSection">
+      <div class="section-head">
+        <h2>${tt('how.title')}</h2>
+        <p>${tt('how.subtitle')}</p>
+      </div>
+      <div class="how-grid">
+        ${[1,2,3].map(n => `
+          <div class="how-step">
+            <div class="num">${n}</div>
+            <h3>${tt('how.s'+n+'Title')}</h3>
+            <p>${tt('how.s'+n+'Body')}</p>
+          </div>
+        `).join('')}
+      </div>
+    </section>
+    <section class="section" id="faqSection">
+      <div class="section-head">
+        <h2>${tt('faq.title')}</h2>
+        <p>${tt('faq.subtitle')}</p>
+      </div>
+      <div class="faq">
+        ${faqKeys.map(k => `
+          <div class="faq-item">
+            <button class="faq-q" type="button">
+              <span>${tt('faq.q'+k)}</span>
+              <span class="chev">${svg('chevDown')}</span>
+            </button>
+            <div class="faq-a"><div style="padding-top:6px">${tt('faq.a'+k)}</div></div>
+          </div>
+        `).join('')}
+      </div>
+    </section>
   `;
-  // Wire up the home dropzone
+  // Wire FAQ accordion
+  document.querySelectorAll('.faq-item').forEach(it => {
+    const q = it.querySelector('.faq-q');
+    q.addEventListener('click', () => it.classList.toggle('open'));
+  });
+  // Wire up the home dropzone — open in the editable annotate page
   const dz = document.getElementById('homedz');
   const inp = dz.querySelector('input');
   const handle = (files) => {
     const fs = [...files].filter(f => f.type === 'application/pdf' || /\.pdf$/i.test(f.name));
-    if (fs.length){ window.__viewerFile = fs[0]; nav('viewer'); }
+    if (fs.length){ window.__pdfFile = fs[0]; window.__viewerFile = fs[0]; nav('annotate'); }
   };
   dz.addEventListener('click', e => { if (e.target.tagName !== 'INPUT') inp.click(); });
   dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
@@ -1284,7 +1556,7 @@ async function renderRotate(main){
 function renderWatermark(main){
   main.innerHTML = `<div class="tool-page">${toolHead('watermark')}<div class="card" id="wcard"></div></div>`;
   const card = document.getElementById('wcard');
-  let file=null, text='CONFIDENTIAL', size=60, opacity=0.25, angle=-30, color='#5b4bff', position='center';
+  let file=null, text='CONFIDENTIAL', size=60, opacity=0.25, angle=-30, color='#5b4bff', position='center', spacing=120;
 
   function paint(){
     if (!file){ card.innerHTML = dropzone({onFiles:fs=>{file=fs[0]; paint();}}); return; }
@@ -1294,23 +1566,25 @@ function renderWatermark(main){
       <div class="row">
         <div class="field"><label>${tt('watermark.position')}</label>
           <select class="select" id="wpos">
-            ${['center','topLeft','topRight','bottomLeft','bottomRight'].map(p=>`<option value="${p}" ${p===position?'selected':''}>${tt('watermark.'+p)}</option>`).join('')}
+            ${['center','tile','topLeft','topRight','bottomLeft','bottomRight'].map(p=>`<option value="${p}" ${p===position?'selected':''}>${tt('watermark.'+p)}</option>`).join('')}
           </select>
         </div>
         <div class="field"><label>${tt('watermark.color')}</label><div style="display:flex;gap:6px"><input type="color" id="wcol" value="${color}"/><input class="input" id="wcolt" value="${color}"/></div></div>
       </div>
-      <div class="field"><label>${tt('watermark.size')} <span style="color:var(--muted);font-weight:400" id="wszL">${size}px</span></label><input type="range" min="20" max="200" step="2" value="${size}" id="wsz"/></div>
+      <div class="field"><label>${tt('watermark.size')} <span style="color:var(--muted);font-weight:400" id="wszL">${size}px</span></label><input type="range" min="${position==='tile'?14:20}" max="${position==='tile'?80:200}" step="2" value="${size}" id="wsz"/></div>
       <div class="field"><label>${tt('watermark.opacity')} <span style="color:var(--muted);font-weight:400" id="wopL">${Math.round(opacity*100)}%</span></label><input type="range" min="5" max="100" step="5" value="${opacity*100}" id="wop"/></div>
-      ${position==='center'?`<div class="field"><label>${tt('watermark.angle')} <span style="color:var(--muted);font-weight:400" id="wagL">${angle}°</span></label><input type="range" min="-90" max="90" step="5" value="${angle}" id="wag"/></div>`:''}
+      ${(position==='center'||position==='tile')?`<div class="field"><label>${tt('watermark.angle')} <span style="color:var(--muted);font-weight:400" id="wagL">${angle}°</span></label><input type="range" min="-90" max="90" step="5" value="${angle}" id="wag"/></div>`:''}
+      ${position==='tile'?`<div class="field"><label>${tt('watermark.spacing')} <span style="color:var(--muted);font-weight:400" id="wspL">${spacing}px</span></label><input type="range" min="40" max="280" step="10" value="${spacing}" id="wsp"/></div>`:''}
       <button class="btn btn-block" id="wdo">${svg('watermark')} ${tt('watermark.action')}</button>
     `;
     document.getElementById('wtxt').oninput = e => text = e.target.value;
-    document.getElementById('wpos').onchange = e => { position = e.target.value; paint(); };
+    document.getElementById('wpos').onchange = e => { position = e.target.value; if (position==='tile' && size>80) size=42; paint(); };
     document.getElementById('wcol').oninput = e => { color = e.target.value; document.getElementById('wcolt').value = color; };
     document.getElementById('wcolt').oninput = e => { color = e.target.value; document.getElementById('wcol').value = color; };
     document.getElementById('wsz').oninput = e => { size=+e.target.value; document.getElementById('wszL').textContent = size+'px'; };
     document.getElementById('wop').oninput = e => { opacity=+e.target.value/100; document.getElementById('wopL').textContent = Math.round(opacity*100)+'%'; };
-    if (position==='center') document.getElementById('wag').oninput = e => { angle=+e.target.value; document.getElementById('wagL').textContent = angle+'°'; };
+    if (position==='center'||position==='tile') document.getElementById('wag').oninput = e => { angle=+e.target.value; document.getElementById('wagL').textContent = angle+'°'; };
+    if (position==='tile') document.getElementById('wsp').oninput = e => { spacing=+e.target.value; document.getElementById('wspL').textContent = spacing+'px'; };
     document.getElementById('wdo').onclick = doIt;
   }
   window.__wm_clr = () => { file=null; paint(); };
@@ -1325,15 +1599,30 @@ function renderWatermark(main){
       doc.getPages().forEach(page => {
         const {width, height} = page.getSize();
         const tw = font.widthOfTextAtSize(text, size);
-        let x, y;
-        switch(position){
-          case 'topLeft': x=40; y=height-size-40; break;
-          case 'topRight': x=width-tw-40; y=height-size-40; break;
-          case 'bottomLeft': x=40; y=40; break;
-          case 'bottomRight': x=width-tw-40; y=40; break;
-          default: x=(width-tw)/2; y=(height-size)/2;
+        if (position === 'tile'){
+          // Tile/repeat across the whole page in a clean grid pattern
+          const stepX = tw + spacing;
+          const stepY = size + spacing;
+          // Cover the whole page including a margin so rotated text reaches edges
+          const margin = Math.max(stepX, stepY);
+          for (let py = -margin; py < height + margin; py += stepY){
+            // Offset every other row by half a step for a nicer pattern
+            const rowOffset = (Math.round(py / stepY) % 2 === 0) ? 0 : stepX/2;
+            for (let px = -margin + rowOffset; px < width + margin; px += stepX){
+              page.drawText(text, {x:px, y:py, size, font, color:rgb(r,g,b), opacity, rotate: degrees(angle)});
+            }
+          }
+        } else {
+          let x, y;
+          switch(position){
+            case 'topLeft': x=40; y=height-size-40; break;
+            case 'topRight': x=width-tw-40; y=height-size-40; break;
+            case 'bottomLeft': x=40; y=40; break;
+            case 'bottomRight': x=width-tw-40; y=40; break;
+            default: x=(width-tw)/2; y=(height-size)/2;
+          }
+          page.drawText(text, {x, y, size, font, color:rgb(r,g,b), opacity, rotate: position==='center'?degrees(angle):degrees(0)});
         }
-        page.drawText(text, {x, y, size, font, color:rgb(r,g,b), opacity, rotate: position==='center'?degrees(angle):degrees(0)});
       });
       downloadBytes(await doc.save(), deriveName(file.name,'watermarked'));
       toast(tt('actions.done'));
@@ -1430,14 +1719,68 @@ async function renderSign(main){
     c.style.width=vp.width+'px'; c.style.height=vp.height+'px';
     const ctx = c.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
     await p.render({canvasContext:ctx, viewport:vp, canvas:c}).promise;
-    document.querySelectorAll('#sgStage .placement').forEach(e=>e.remove());
-    placements.filter(pl => pl.page===page).forEach(pl => {
+    const stage = document.getElementById('sgStage');
+    stage.querySelectorAll('.placement').forEach(e=>e.remove());
+    placements.filter(pl => pl.page===page).forEach((pl,idx) => {
+      pl.id = pl.id || ('s'+idx+Math.random().toString(36).slice(2));
       const d = document.createElement('div');
       d.className = 'placement';
       d.style.left = (pl.x*100)+'%'; d.style.top = (pl.y*100)+'%';
       d.style.width = (pl.w*100)+'%';
       d.innerHTML = `<img src="${sigUrl}"/>`;
-      document.getElementById('sgStage').appendChild(d);
+      stage.appendChild(d);
+      // Custom interactive: drag + resize via width
+      const onDown = e => {
+        if (e.target.classList.contains('ph-handle')) return;
+        stage.querySelectorAll('.placement.selected').forEach(p=>p.classList.remove('selected'));
+        d.classList.add('selected');
+        const t = e.touches ? e.touches[0] : e;
+        const sx=t.clientX, sy=t.clientY, ox=pl.x, oy=pl.y;
+        let moving = true;
+        const mv = ev => {
+          if (!moving) return;
+          const tt2 = ev.touches ? ev.touches[0] : ev;
+          const r = stage.getBoundingClientRect();
+          pl.x = Math.max(0, Math.min(1, ox + (tt2.clientX-sx)/r.width));
+          pl.y = Math.max(0, Math.min(1, oy + (tt2.clientY-sy)/r.height));
+          d.style.left=(pl.x*100)+'%'; d.style.top=(pl.y*100)+'%';
+        };
+        const up = () => { moving=false; document.removeEventListener('mousemove',mv); document.removeEventListener('mouseup',up); document.removeEventListener('touchmove',mv); document.removeEventListener('touchend',up); };
+        document.addEventListener('mousemove', mv);
+        document.addEventListener('mouseup', up);
+        document.addEventListener('touchmove', mv, {passive:false});
+        document.addEventListener('touchend', up);
+        e.stopPropagation(); e.preventDefault();
+      };
+      d.addEventListener('mousedown', onDown);
+      d.addEventListener('touchstart', onDown, {passive:false});
+      // Resize handle
+      const hr = document.createElement('div'); hr.className='ph-handle br';
+      d.appendChild(hr);
+      const startR = e => {
+        const t = e.touches ? e.touches[0] : e;
+        const sx=t.clientX, w0=pl.w; let resizing=true;
+        const mv = ev => {
+          if (!resizing) return;
+          const tt2 = ev.touches ? ev.touches[0] : ev;
+          const r = stage.getBoundingClientRect();
+          pl.w = Math.max(0.05, Math.min(0.9, w0 + (tt2.clientX-sx)/r.width));
+          d.style.width=(pl.w*100)+'%';
+        };
+        const up = () => { resizing=false; document.removeEventListener('mousemove',mv); document.removeEventListener('mouseup',up); document.removeEventListener('touchmove',mv); document.removeEventListener('touchend',up); };
+        document.addEventListener('mousemove', mv);
+        document.addEventListener('mouseup', up);
+        document.addEventListener('touchmove', mv, {passive:false});
+        document.addEventListener('touchend', up);
+        e.stopPropagation(); e.preventDefault();
+      };
+      hr.addEventListener('mousedown', startR);
+      hr.addEventListener('touchstart', startR, {passive:false});
+      // Delete handle
+      const hd = document.createElement('div'); hd.className='ph-handle del'; hd.textContent='×';
+      hd.addEventListener('mousedown', e => e.stopPropagation());
+      hd.addEventListener('click', e => { e.stopPropagation(); placements = placements.filter(x => x.id !== pl.id); drawPage(); });
+      d.appendChild(hd);
     });
   }
   window.__sg_clr = () => { file=null; pdf=null; sigUrl=null; placements=[]; paint(); };
@@ -1467,14 +1810,148 @@ async function renderSign(main){
 }
 
 /* ================== ANNOTATE ================== */
+/* Shared interactive helper: makes a placement element draggable, resizable,
+   and (for text) editable. Updates the underlying ann object in place. */
+function makeInteractive(el, ann, opts){
+  const stage = opts.stage;
+  const onChange = opts.onChange || (()=>{});
+  const onDelete = opts.onDelete || (()=>{});
+  const minPx = opts.minPx || 24;
+
+  // Selection
+  el.addEventListener('mousedown', e => {
+    if (e.target.classList.contains('ph-handle')) return;
+    stage.querySelectorAll('.placement.selected').forEach(p => p.classList.remove('selected'));
+    el.classList.add('selected');
+    e.stopPropagation();
+  });
+
+  // Drag move
+  let dragging = false, sx=0, sy=0, ox=0, oy=0;
+  const onPointerDown = e => {
+    if (e.target.classList.contains('ph-handle')) return;
+    if (el.classList.contains('text') && el.classList.contains('editing')) return;
+    dragging = true;
+    const t = e.touches ? e.touches[0] : e;
+    sx = t.clientX; sy = t.clientY;
+    ox = ann.x; oy = ann.y;
+    e.preventDefault();
+  };
+  const onPointerMove = e => {
+    if (!dragging) return;
+    const t = e.touches ? e.touches[0] : e;
+    const r = stage.getBoundingClientRect();
+    const dx = (t.clientX - sx) / r.width;
+    const dy = (t.clientY - sy) / r.height;
+    ann.x = Math.max(0, Math.min(1, ox + dx));
+    ann.y = Math.max(0, Math.min(1, oy + dy));
+    el.style.left = (ann.x*100)+'%';
+    el.style.top  = (ann.y*100)+'%';
+  };
+  const onPointerUp = () => { if (dragging){ dragging=false; onChange(); } };
+  el.addEventListener('mousedown', onPointerDown);
+  el.addEventListener('touchstart', onPointerDown, {passive:false});
+  document.addEventListener('mousemove', onPointerMove);
+  document.addEventListener('touchmove', onPointerMove, {passive:false});
+  document.addEventListener('mouseup', onPointerUp);
+  document.addEventListener('touchend', onPointerUp);
+
+  // Resize handle (bottom-right)
+  const hr = document.createElement('div'); hr.className='ph-handle br';
+  el.appendChild(hr);
+  let resizing=false, rsx=0, rsy=0, rw0=0, rh0=0, rfs0=0;
+  const startResize = e => {
+    resizing=true;
+    const t = e.touches ? e.touches[0] : e;
+    rsx = t.clientX; rsy = t.clientY;
+    const rect = el.getBoundingClientRect();
+    rw0 = rect.width; rh0 = rect.height;
+    rfs0 = parseFloat(getComputedStyle(el).fontSize) || 14;
+    e.stopPropagation(); e.preventDefault();
+  };
+  const moveResize = e => {
+    if (!resizing) return;
+    const t = e.touches ? e.touches[0] : e;
+    const dx = t.clientX - rsx;
+    const stageRect = stage.getBoundingClientRect();
+    if (ann.type === 'highlight'){
+      const nw = Math.max(minPx, rw0 + dx);
+      const nh = Math.max(8, rh0 + (t.clientY - rsy));
+      ann.w = nw / stageRect.width;
+      ann.h = nh / stageRect.height;
+      el.style.width = nw+'px';
+      el.style.height = nh+'px';
+    } else {
+      // Text or stamp: resize via font size (use horizontal delta)
+      const scale = Math.max(0.4, (rw0 + dx) / Math.max(rw0, 40));
+      const nfs = Math.max(8, Math.min(96, rfs0 * scale));
+      ann.size = nfs;
+      el.style.fontSize = nfs + 'px';
+    }
+  };
+  const endResize = () => { if (resizing){ resizing=false; onChange(); } };
+  hr.addEventListener('mousedown', startResize);
+  hr.addEventListener('touchstart', startResize, {passive:false});
+  document.addEventListener('mousemove', moveResize);
+  document.addEventListener('touchmove', moveResize, {passive:false});
+  document.addEventListener('mouseup', endResize);
+  document.addEventListener('touchend', endResize);
+
+  // Delete handle
+  const hd = document.createElement('div'); hd.className='ph-handle del'; hd.textContent='×';
+  hd.addEventListener('mousedown', e => e.stopPropagation());
+  hd.addEventListener('click', e => { e.stopPropagation(); onDelete(); });
+  el.appendChild(hd);
+
+  // Double-click to edit text
+  if (ann.type === 'text'){
+    el.addEventListener('dblclick', e => {
+      e.stopPropagation();
+      el.classList.add('editing');
+      const cur = ann.text;
+      el.innerHTML = `<input value="${cur.replace(/"/g,'&quot;')}" />`;
+      const inp = el.querySelector('input');
+      inp.focus(); inp.select();
+      const finish = () => {
+        ann.text = inp.value || cur;
+        el.classList.remove('editing');
+        el.textContent = ann.text;
+        // re-attach handles
+        el.appendChild(hr); el.appendChild(hd);
+        onChange();
+      };
+      inp.addEventListener('blur', finish);
+      inp.addEventListener('keydown', ev => { if (ev.key === 'Enter'){ ev.preventDefault(); inp.blur(); } });
+    });
+  }
+}
+
 async function renderAnnotate(main){
   main.innerHTML = `<div class="tool-page" style="max-width:1100px">${toolHead('annotate')}<div id="ancard"></div></div>`;
   const card = document.getElementById('ancard');
-  let file=null, pdf=null, page=1, tool='text', textIn='Note', stampKind='approved', anns=[];
+  let file = window.__pdfFile || null;
+  let pdf=null, page=1, tool='text', textIn='Note', textSize=16, textColor='#1e1b4b', hlColor='#facc15', stampKind='approved', penColor='#dc2626', penSize=3, anns=[];
   const STAMP_C = {approved:'#16a34a', rejected:'#dc2626', confidential:'#dc2626', draft:'#6b7280'};
+  const HL_PRESETS = ['#facc15','#86efac','#fca5a5','#93c5fd','#fdba74','#d8b4fe'];
+  const PEN_PRESETS = ['#dc2626','#1e40af','#16a34a','#000000','#f59e0b','#a855f7'];
+
+  async function loadInitial(){
+    if (file){
+      try { pdf = await loadPdfJs(await file.arrayBuffer()); }
+      catch { toast(tt('errors.invalid'),'error'); file=null; window.__pdfFile=null; }
+    }
+    paint();
+  }
 
   async function paint(){
-    if (!file){ card.innerHTML = `<div class="card">${dropzone({onFiles: async fs => { file=fs[0]; pdf=await loadPdfJs(await file.arrayBuffer()); paint(); }})}</div>`; return; }
+    if (!file){
+      card.innerHTML = `<div class="card">${dropzone({onFiles: async fs => {
+        file=fs[0]; window.__pdfFile=file;
+        try { pdf=await loadPdfJs(await file.arrayBuffer()); } catch { toast(tt('errors.invalid'),'error'); file=null; paint(); return; }
+        paint();
+      }})}</div>`;
+      return;
+    }
     card.innerHTML = `
       <div style="display:grid;grid-template-columns:1fr 300px;gap:16px" id="anGrid">
         <div class="card" style="background:color-mix(in srgb,var(--bg) 50%,#000 4%);display:flex;justify-content:center;padding:18px;min-height:400px;overflow:auto">
@@ -1486,10 +1963,31 @@ async function renderAnnotate(main){
               <button class="btn ${tool==='text'?'':'btn-outline'} btn-sm" data-t="text">${tt('annotate.text')}</button>
               <button class="btn ${tool==='highlight'?'':'btn-outline'} btn-sm" data-t="highlight">${tt('annotate.highlight')}</button>
               <button class="btn ${tool==='stamp'?'':'btn-outline'} btn-sm" data-t="stamp">${tt('annotate.stamp')}</button>
+              <button class="btn ${tool==='draw'?'':'btn-outline'} btn-sm" data-t="draw">${tt('annotate.draw')}</button>
             </div>
-            ${tool==='text'?`<div class="field"><label>${tt('annotate.textValue')}</label><input class="input" id="anTxt" value="${textIn}"/></div>`:''}
+            ${tool==='text'?`
+              <div class="field"><label>${tt('annotate.textValue')}</label><input class="input" id="anTxt" value="${textIn}"/></div>
+              <div class="field"><label>${tt('annotate.textSize')} <span style="color:var(--muted);font-weight:400" id="anFsL">${textSize}px</span></label><input type="range" min="8" max="64" value="${textSize}" id="anFs"/></div>
+              <div class="field"><label>${tt('annotate.textColor')}</label><div style="display:flex;gap:6px;align-items:center"><input type="color" id="anTc" value="${textColor}" style="width:42px;height:32px;border:1px solid var(--border);border-radius:6px;background:none;cursor:pointer"/><input class="input" id="anTcT" value="${textColor}" style="font-family:ui-monospace,monospace;font-size:13px"/></div></div>`:''}
+            ${tool==='highlight'?`
+              <div class="field"><label>${tt('annotate.hlColor')}</label>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+                  ${HL_PRESETS.map(c=>`<button type="button" data-hl="${c}" style="width:28px;height:28px;border-radius:50%;border:2px solid ${c===hlColor?'#1e293b':'transparent'};background:${c};cursor:pointer;padding:0"></button>`).join('')}
+                </div>
+                <div style="display:flex;gap:6px;align-items:center"><input type="color" id="anHc" value="${hlColor}" style="width:42px;height:32px;border:1px solid var(--border);border-radius:6px;background:none;cursor:pointer"/><input class="input" id="anHcT" value="${hlColor}" style="font-family:ui-monospace,monospace;font-size:13px"/></div>
+              </div>`:''}
             ${tool==='stamp'?`<div class="field"><label>${tt('annotate.stampType')}</label><select class="select" id="anStK">${['approved','rejected','confidential','draft'].map(s=>`<option value="${s}" ${s===stampKind?'selected':''}>${tt('annotate.'+s)}</option>`).join('')}</select></div>`:''}
-            <p style="font-size:12px;color:var(--muted);margin:6px 0 0">${tt('annotate.clickHint')}</p>
+            ${tool==='draw'?`
+              <div class="field"><label>${tt('annotate.penColor')}</label>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+                  ${PEN_PRESETS.map(c=>`<button type="button" data-pen="${c}" style="width:28px;height:28px;border-radius:50%;border:2px solid ${c===penColor?'#1e293b':'transparent'};background:${c};cursor:pointer;padding:0"></button>`).join('')}
+                </div>
+                <div style="display:flex;gap:6px;align-items:center"><input type="color" id="anPc" value="${penColor}" style="width:42px;height:32px;border:1px solid var(--border);border-radius:6px;background:none;cursor:pointer"/><input class="input" id="anPcT" value="${penColor}" style="font-family:ui-monospace,monospace;font-size:13px"/></div>
+              </div>
+              <div class="field"><label>${tt('annotate.penSize')} <span style="color:var(--muted);font-weight:400" id="anPsL">${penSize}px</span></label><input type="range" min="1" max="14" value="${penSize}" id="anPs"/></div>
+              <button class="btn btn-outline btn-sm" id="anClrDraw" style="width:100%;margin-top:4px">${tt('annotate.clearDraw')}</button>`:''}
+            <p style="font-size:12px;color:var(--muted);margin:6px 0 0">${tool==='draw'?tt('annotate.drawHint'):tt('annotate.clickHint')}</p>
+            ${tool==='text'?`<p style="font-size:12px;color:var(--muted);margin:4px 0 0">${tt('annotate.editHint')}</p>`:''}
           </div>
           ${pdf.numPages>1?`<div class="card" style="display:flex;justify-content:space-between;align-items:center"><button class="btn btn-ghost btn-sm" id="anPrev">${tt('actions.prev')}</button><span style="font-size:13px">${page} / ${pdf.numPages}</span><button class="btn btn-ghost btn-sm" id="anNext">${tt('actions.next')}</button></div>`:''}
           ${anns.length?`<div class="card"><button class="btn btn-outline btn-sm" style="width:100%;color:var(--danger);border-color:color-mix(in srgb,var(--danger) 40%,var(--border))" onclick="window.__an_resetAnns()">${tt('actions.clear')} (${anns.length})</button></div>`:''}
@@ -1503,22 +2001,79 @@ async function renderAnnotate(main){
       </div>`;
     if (innerWidth < 900) document.getElementById('anGrid').style.gridTemplateColumns='1fr';
     document.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { tool = b.dataset.t; paint(); });
-    if (tool==='text') document.getElementById('anTxt').oninput = e => textIn = e.target.value;
+    if (tool==='text'){
+      document.getElementById('anTxt').oninput = e => textIn = e.target.value;
+      const fs = document.getElementById('anFs');
+      fs.oninput = e => { textSize = +e.target.value; document.getElementById('anFsL').textContent = textSize+'px'; };
+      const tc = document.getElementById('anTc'), tcT = document.getElementById('anTcT');
+      tc.oninput = e => { textColor = e.target.value; tcT.value = textColor; };
+      tcT.oninput = e => { if (/^#[0-9a-f]{6}$/i.test(e.target.value)){ textColor = e.target.value; tc.value = textColor; } };
+    }
+    if (tool==='highlight'){
+      document.querySelectorAll('[data-hl]').forEach(b => b.onclick = () => { hlColor = b.dataset.hl; paint(); });
+      const hc = document.getElementById('anHc'), hcT = document.getElementById('anHcT');
+      hc.oninput = e => { hlColor = e.target.value; hcT.value = hlColor; paint(); };
+      hcT.oninput = e => { if (/^#[0-9a-f]{6}$/i.test(e.target.value)){ hlColor = e.target.value; hc.value = hlColor; paint(); } };
+    }
     if (tool==='stamp') document.getElementById('anStK').onchange = e => stampKind = e.target.value;
+    if (tool==='draw'){
+      document.querySelectorAll('[data-pen]').forEach(b => b.onclick = () => { penColor = b.dataset.pen; paint(); });
+      const pc = document.getElementById('anPc'), pcT = document.getElementById('anPcT');
+      pc.oninput = e => { penColor = e.target.value; pcT.value = penColor; };
+      pcT.oninput = e => { if (/^#[0-9a-f]{6}$/i.test(e.target.value)){ penColor = e.target.value; pc.value = penColor; } };
+      const ps = document.getElementById('anPs');
+      ps.oninput = e => { penSize = +e.target.value; document.getElementById('anPsL').textContent = penSize+'px'; };
+      document.getElementById('anClrDraw').onclick = () => { anns = anns.filter(a => !(a.type==='draw' && a.page===page)); paint(); };
+    }
     if (pdf.numPages > 1){
       document.getElementById('anPrev').onclick = () => { if (page>1){page--; paint();} };
       document.getElementById('anNext').onclick = () => { if (page<pdf.numPages){page++; paint();} };
     }
     document.getElementById('anSave').onclick = doSave;
-    document.getElementById('anStage').onclick = e => {
-      const r = e.currentTarget.getBoundingClientRect();
-      const x = (e.clientX-r.left)/r.width, y = (e.clientY-r.top)/r.height;
-      const id = 'a'+Math.random().toString(36).slice(2);
-      if (tool==='text'){ if (!textIn.trim()) return; anns.push({id,page,type:'text',x,y,text:textIn}); }
-      else if (tool==='highlight') anns.push({id,page,type:'highlight',x,y,w:0.18,h:0.025});
-      else anns.push({id,page,type:'stamp',x,y,kind:stampKind});
-      drawPage();
-    };
+    const stage = document.getElementById('anStage');
+    if (tool==='draw'){
+      // Free-draw mode: mousedown starts a stroke, mousemove appends points, mouseup ends.
+      let active = null;
+      const start = (e) => {
+        if (e.target.closest('.placement')) return;
+        e.preventDefault();
+        const r = stage.getBoundingClientRect();
+        const x = (e.clientX-r.left)/r.width, y = (e.clientY-r.top)/r.height;
+        active = { id:'a'+Math.random().toString(36).slice(2), page, type:'draw', color:penColor, size:penSize, points:[[x,y]] };
+        anns.push(active);
+        drawPage();
+      };
+      const move = (e) => {
+        if (!active) return;
+        const r = stage.getBoundingClientRect();
+        const x = (e.clientX-r.left)/r.width, y = (e.clientY-r.top)/r.height;
+        // Avoid storing duplicate points
+        const last = active.points[active.points.length-1];
+        if (Math.hypot(x-last[0], y-last[1]) > 0.002){
+          active.points.push([x,y]);
+          drawPage();
+        }
+      };
+      const end = () => { active = null; };
+      stage.addEventListener('mousedown', start);
+      window.addEventListener('mousemove', move);
+      window.addEventListener('mouseup', end);
+      stage.addEventListener('touchstart', e => start(e.touches[0]), {passive:false});
+      stage.addEventListener('touchmove', e => { e.preventDefault(); move(e.touches[0]); }, {passive:false});
+      stage.addEventListener('touchend', end);
+    } else {
+      stage.onclick = e => {
+        if (e.target.closest('.placement')) return;
+        stage.querySelectorAll('.placement.selected').forEach(p => p.classList.remove('selected'));
+        const r = e.currentTarget.getBoundingClientRect();
+        const x = (e.clientX-r.left)/r.width, y = (e.clientY-r.top)/r.height;
+        const id = 'a'+Math.random().toString(36).slice(2);
+        if (tool==='text'){ if (!textIn.trim()) return; anns.push({id,page,type:'text',x,y,text:textIn,size:textSize,color:textColor}); }
+        else if (tool==='highlight') anns.push({id,page,type:'highlight',x,y,w:0.20,h:0.030,color:hlColor});
+        else anns.push({id,page,type:'stamp',x,y,kind:stampKind,size:14});
+        drawPage();
+      };
+    }
     drawPage();
   }
   async function drawPage(){
@@ -1531,17 +2086,67 @@ async function renderAnnotate(main){
     const ctx = c.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
     await p.render({canvasContext:ctx, viewport:vp, canvas:c}).promise;
     const stage = document.getElementById('anStage');
-    stage.querySelectorAll('.placement').forEach(e=>e.remove());
-    anns.filter(a=>a.page===page).forEach(a => {
+    stage.querySelectorAll('.placement, .draw-layer').forEach(e=>e.remove());
+    // Render free-draw strokes as one absolutely positioned SVG layer
+    const drawAnns = anns.filter(a => a.page===page && a.type==='draw');
+    if (drawAnns.length){
+      const ns = 'http://www.w3.org/2000/svg';
+      const layer = document.createElementNS(ns, 'svg');
+      layer.setAttribute('class','draw-layer');
+      layer.setAttribute('viewBox', `0 0 ${vp.width} ${vp.height}`);
+      layer.setAttribute('width', vp.width);
+      layer.setAttribute('height', vp.height);
+      layer.style.cssText = `position:absolute;left:0;top:0;width:${vp.width}px;height:${vp.height}px;pointer-events:none`;
+      drawAnns.forEach(a => {
+        if (a.points.length < 2){
+          // Single dot
+          const cir = document.createElementNS(ns,'circle');
+          cir.setAttribute('cx', a.points[0][0]*vp.width);
+          cir.setAttribute('cy', a.points[0][1]*vp.height);
+          cir.setAttribute('r', (a.size||3)/2);
+          cir.setAttribute('fill', a.color||'#dc2626');
+          layer.appendChild(cir);
+        } else {
+          const path = document.createElementNS(ns,'path');
+          const d = a.points.map((p,i) => `${i?'L':'M'}${p[0]*vp.width} ${p[1]*vp.height}`).join(' ');
+          path.setAttribute('d', d);
+          path.setAttribute('stroke', a.color||'#dc2626');
+          path.setAttribute('stroke-width', a.size||3);
+          path.setAttribute('fill', 'none');
+          path.setAttribute('stroke-linecap', 'round');
+          path.setAttribute('stroke-linejoin', 'round');
+          layer.appendChild(path);
+        }
+      });
+      stage.appendChild(layer);
+    }
+    // Render placements (text / highlight / stamp)
+    anns.filter(a=>a.page===page && a.type!=='draw').forEach(a => {
       const d = document.createElement('div'); d.className='placement '+a.type;
       d.style.left=(a.x*100)+'%'; d.style.top=(a.y*100)+'%';
-      if (a.type==='text') d.textContent = a.text;
-      else if (a.type==='highlight'){ d.style.width=(a.w*vp.width)+'px'; d.style.height=(a.h*vp.height)+'px'; d.style.transform='translate(0,-50%)'; }
-      else if (a.type==='stamp'){ const c=STAMP_C[a.kind]; d.style.color=c; d.style.borderColor=c; d.style.background=`${c}1a`; d.textContent = tt('annotate.'+a.kind); }
+      if (a.type==='text'){
+        d.style.fontSize = (a.size||16)+'px';
+        if (a.color) d.style.color = a.color;
+        d.textContent = a.text;
+      } else if (a.type==='highlight'){
+        d.style.width=(a.w*vp.width)+'px';
+        d.style.height=(a.h*vp.height)+'px';
+        if (a.color) d.style.background = a.color + '73';
+      } else if (a.type==='stamp'){
+        const cc=STAMP_C[a.kind];
+        d.style.color=cc; d.style.borderColor=cc; d.style.background=`${cc}1a`;
+        d.style.fontSize=(a.size||14)+'px';
+        d.textContent = tt('annotate.'+a.kind);
+      }
       stage.appendChild(d);
+      makeInteractive(d, a, {
+        stage,
+        onChange: () => {},
+        onDelete: () => { anns = anns.filter(x => x.id !== a.id); drawPage(); }
+      });
     });
   }
-  window.__an_clr = () => { file=null; pdf=null; anns=[]; paint(); };
+  window.__an_clr = () => { file=null; pdf=null; anns=[]; window.__pdfFile=null; paint(); };
   window.__an_resetAnns = () => { anns=[]; paint(); };
   async function doSave(){
     if (!anns.length) return;
@@ -1555,24 +2160,294 @@ async function renderAnnotate(main){
         const pg = pages[a.page-1]; if (!pg) return;
         const {width, height} = pg.getSize();
         const x = a.x*width, y = height - a.y*height;
-        if (a.type==='text') pg.drawText(a.text, {x, y:y-12, size:12, font:fnt, color:rgb(0.1,0.1,0.3)});
+        if (a.type==='text'){
+          const sz = (a.size||16);
+          const w = fnt.widthOfTextAtSize(a.text, sz);
+          const tc = hexToRgb(a.color || '#1e1b4b');
+          pg.drawText(a.text, {x:x - w/2, y:y - sz/2, size:sz, font:fnt, color:rgb(tc[0],tc[1],tc[2])});
+        }
         else if (a.type==='highlight'){
           const w = a.w*width, h = a.h*height;
-          pg.drawRectangle({x, y:y-h, width:w, height:h, color:rgb(1,.95,.3), opacity:.4});
+          const hc = hexToRgb(a.color || '#facc15');
+          pg.drawRectangle({x, y:y-h/2, width:w, height:h, color:rgb(hc[0],hc[1],hc[2]), opacity:.4});
         } else if (a.type==='stamp'){
           const c = STAMP_C[a.kind]; const r=parseInt(c.slice(1,3),16)/255, g=parseInt(c.slice(3,5),16)/255, b=parseInt(c.slice(5,7),16)/255;
           const label = tt('annotate.'+a.kind).toUpperCase();
-          const sw=160, sh=44;
+          const sz = Math.max(14, (a.size||14) * 1.6);
+          const tw = fntB.widthOfTextAtSize(label,sz);
+          const sw = tw + 28, sh = sz + 14;
           pg.drawRectangle({x:x-sw/2, y:y-sh/2, width:sw, height:sh, borderColor:rgb(r,g,b), borderWidth:3, color:rgb(r,g,b), opacity:.08, borderOpacity:.9});
-          const tw = fntB.widthOfTextAtSize(label,22);
-          pg.drawText(label, {x:x-tw/2, y:y-8, size:22, font:fntB, color:rgb(r,g,b), opacity:.9});
+          pg.drawText(label, {x:x-tw/2, y:y-sz/3, size:sz, font:fntB, color:rgb(r,g,b), opacity:.9});
         }
       });
-      downloadBytes(await doc.save(), deriveName(file.name,'annotated'));
+      // Draw free-draw strokes — each stroke is a series of tiny line segments
+      anns.filter(a => a.type==='draw').forEach(a => {
+        const pg = pages[a.page-1]; if (!pg) return;
+        const {width, height} = pg.getSize();
+        const dc = hexToRgb(a.color || '#dc2626');
+        const sw = (a.size || 3);
+        if (a.points.length < 2){
+          const px = a.points[0][0]*width, py = height - a.points[0][1]*height;
+          pg.drawCircle({x:px, y:py, size:sw/2, color:rgb(dc[0],dc[1],dc[2])});
+          return;
+        }
+        for (let i=1; i<a.points.length; i++){
+          const [x1,y1] = a.points[i-1], [x2,y2] = a.points[i];
+          pg.drawLine({
+            start:{x:x1*width, y:height - y1*height},
+            end:{x:x2*width, y:height - y2*height},
+            thickness: sw,
+            color: rgb(dc[0],dc[1],dc[2]),
+            lineCap: LineCapStyle.Round
+          });
+        }
+      });
+      downloadBytes(await doc.save(), deriveName(file.name,'edited'));
       toast(tt('actions.done'));
     } catch(e){ console.error(e); toast(tt('errors.generic'),'error'); }
     finally { btn.disabled = false; }
   }
+  loadInitial();
+}
+
+/* ================== CROP ================== */
+async function renderCrop(main){
+  main.innerHTML = `<div class="tool-page" style="max-width:1100px">${toolHead('crop')}<div id="ccard"></div></div>`;
+  const card = document.getElementById('ccard');
+  let file=null, pdf=null, page=1, scope='current', sel=null;
+
+  async function paint(){
+    if (!file){ card.innerHTML = `<div class="card">${dropzone({onFiles: async fs => { file=fs[0]; try { pdf=await loadPdfJs(await file.arrayBuffer()); } catch { toast(tt('errors.invalid'),'error'); file=null; paint(); return; } sel=null; page=1; paint(); }})}</div>`; return; }
+    card.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 280px;gap:16px" id="cGrid">
+        <div class="card" style="background:color-mix(in srgb,var(--bg) 50%,#000 4%);display:flex;justify-content:center;padding:18px;min-height:400px;overflow:auto">
+          <div class="doc-stage" id="cStage" style="cursor:crosshair;user-select:none">
+            <canvas id="cCanvas"></canvas>
+            <div id="cBox" style="position:absolute;border:2px dashed #1e40af;background:rgba(30,64,175,.12);display:none;pointer-events:none"></div>
+            <div id="cMask" style="position:absolute;inset:0;pointer-events:none;display:none">
+              <div style="position:absolute;inset:0;box-shadow:inset 0 0 0 9999px rgba(15,23,42,.45)"></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div style="font-weight:600;margin-bottom:8px">${file.name}</div>
+            <div style="color:var(--muted);font-size:13px">${tt('crop.area')}: <span id="cInfo">${sel? Math.round(sel.w*100)+'% × '+Math.round(sel.h*100)+'%' : '—'}</span></div>
+          </div>
+          <div class="card">
+            <div class="field"><label>${tt('crop.apply')}</label>
+              <select class="select" id="cScope">
+                <option value="current" ${scope==='current'?'selected':''}>${tt('crop.currentPage')}</option>
+                <option value="all" ${scope==='all'?'selected':''}>${tt('crop.allPages')}</option>
+              </select>
+            </div>
+            <button class="btn btn-outline btn-sm" id="cReset" style="width:100%;margin-bottom:8px">${tt('crop.reset')}</button>
+          </div>
+          ${pdf.numPages>1?`<div class="card" style="display:flex;justify-content:space-between;align-items:center"><button class="btn btn-ghost btn-sm" id="cPrev">${tt('actions.prev')}</button><span style="font-size:13px">${page} / ${pdf.numPages}</span><button class="btn btn-ghost btn-sm" id="cNext">${tt('actions.next')}</button></div>`:''}
+          <div class="card">
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-outline" style="flex:1" id="cClr">${tt('actions.back')}</button>
+              <button class="btn" style="flex:1" id="cDo">${svg('arrowDown')} ${tt('crop.action')}</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    if (innerWidth < 900) document.getElementById('cGrid').style.gridTemplateColumns='1fr';
+    document.getElementById('cScope').onchange = e => scope = e.target.value;
+    document.getElementById('cReset').onclick = () => { sel=null; paint(); };
+    document.getElementById('cClr').onclick = () => { file=null; pdf=null; sel=null; paint(); };
+    document.getElementById('cDo').onclick = doSave;
+    if (pdf.numPages>1){
+      document.getElementById('cPrev').onclick = () => { if (page>1){page--; paint();} };
+      document.getElementById('cNext').onclick = () => { if (page<pdf.numPages){page++; paint();} };
+    }
+    await drawPage();
+    bindDrag();
+  }
+
+  async function drawPage(){
+    const p = await pdf.getPage(page);
+    const vp = p.getViewport({scale:1.2});
+    const c = document.getElementById('cCanvas');
+    const dpr = devicePixelRatio||1;
+    c.width = vp.width*dpr; c.height = vp.height*dpr;
+    c.style.width=vp.width+'px'; c.style.height=vp.height+'px';
+    const ctx = c.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+    await p.render({canvasContext:ctx, viewport:vp, canvas:c}).promise;
+    paintBox();
+  }
+
+  function paintBox(){
+    const stage = document.getElementById('cStage');
+    const box = document.getElementById('cBox');
+    if (!sel){ box.style.display='none'; return; }
+    const w = stage.clientWidth, h = stage.clientHeight;
+    box.style.display='block';
+    box.style.left = (sel.x*w)+'px';
+    box.style.top = (sel.y*h)+'px';
+    box.style.width = (sel.w*w)+'px';
+    box.style.height = (sel.h*h)+'px';
+    const info = document.getElementById('cInfo');
+    if (info) info.textContent = Math.round(sel.w*100)+'% × '+Math.round(sel.h*100)+'%';
+  }
+
+  function bindDrag(){
+    const stage = document.getElementById('cStage');
+    let start = null;
+    const begin = (e) => {
+      e.preventDefault();
+      const r = stage.getBoundingClientRect();
+      start = { x:(e.clientX-r.left)/r.width, y:(e.clientY-r.top)/r.height };
+      sel = { x:start.x, y:start.y, w:0, h:0 };
+      paintBox();
+    };
+    const move = (e) => {
+      if (!start) return;
+      const r = stage.getBoundingClientRect();
+      const x = Math.max(0, Math.min(1, (e.clientX-r.left)/r.width));
+      const y = Math.max(0, Math.min(1, (e.clientY-r.top)/r.height));
+      sel = { x:Math.min(start.x,x), y:Math.min(start.y,y), w:Math.abs(x-start.x), h:Math.abs(y-start.y) };
+      paintBox();
+    };
+    const end = () => {
+      if (start && (sel.w<0.01 || sel.h<0.01)) sel = null;
+      start = null;
+      paintBox();
+    };
+    stage.addEventListener('mousedown', begin);
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', end);
+    stage.addEventListener('touchstart', e => begin(e.touches[0]), {passive:false});
+    stage.addEventListener('touchmove', e => { e.preventDefault(); move(e.touches[0]); }, {passive:false});
+    stage.addEventListener('touchend', end);
+  }
+
+  async function doSave(){
+    if (!sel || sel.w<0.02 || sel.h<0.02){ toast(tt('crop.noArea'),'error'); return; }
+    const btn = document.getElementById('cDo'); btn.disabled = true;
+    try {
+      const doc = await PDFDocument.load(await file.arrayBuffer(),{ignoreEncryption:true});
+      const pages = doc.getPages();
+      const targets = scope==='all' ? pages.map((_,i)=>i) : [page-1];
+      targets.forEach(i => {
+        const pg = pages[i]; if (!pg) return;
+        const {width, height} = pg.getSize();
+        const x = sel.x*width;
+        const w = sel.w*width;
+        const yTop = sel.y*height;
+        const h = sel.h*height;
+        // PDF origin is bottom-left, so flip y
+        const y = height - yTop - h;
+        pg.setCropBox(x, y, w, h);
+        pg.setMediaBox(x, y, w, h);
+      });
+      downloadBytes(await doc.save(), deriveName(file.name,'cropped'));
+      toast(tt('actions.done'));
+    } catch(e){ console.error(e); toast(tt('errors.generic'),'error'); }
+    finally { btn.disabled = false; }
+  }
+
+  paint();
+}
+
+/* ================== OCR ================== */
+async function renderOcr(main){
+  main.innerHTML = `<div class="tool-page" style="max-width:1000px">${toolHead('ocr')}<div id="ocard"></div></div>`;
+  const card = document.getElementById('ocard');
+  let file=null, pdf=null, lang='ara+eng', running=false, results='';
+
+  function paint(){
+    if (!file){ card.innerHTML = `<div class="card">${dropzone({onFiles: async fs => { file=fs[0]; try { pdf=await loadPdfJs(await file.arrayBuffer()); } catch { toast(tt('errors.invalid'),'error'); file=null; paint(); return; } results=''; paint(); }})}</div>`; return; }
+    card.innerHTML = `
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+          <div><div style="font-weight:600">${file.name}</div><div style="color:var(--muted);font-size:13px">${tt('ocr.pages')}: ${pdf.numPages}</div></div>
+          <button class="btn btn-outline btn-sm" id="oClr">${tt('actions.clear')}</button>
+        </div>
+        <div class="field"><label>${tt('ocr.language')}</label>
+          <select class="select" id="oLang">
+            <option value="ara+eng" ${lang==='ara+eng'?'selected':''}>${tt('ocr.langArEn')}</option>
+            <option value="ara" ${lang==='ara'?'selected':''}>${tt('ocr.langAr')}</option>
+            <option value="eng" ${lang==='eng'?'selected':''}>${tt('ocr.langEn')}</option>
+          </select>
+        </div>
+        <button class="btn" style="width:100%" id="oRun" ${running?'disabled':''}>${svg('ocr')} ${tt('ocr.action')}</button>
+        <div id="oStatus" style="font-size:13px;color:var(--muted);margin-top:10px;min-height:18px"></div>
+        <div id="oProg" style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:6px;display:none"><div id="oProgBar" style="height:100%;width:0;background:var(--brand);transition:width .25s"></div></div>
+        ${results?`<div style="margin-top:14px"><label style="font-weight:600;font-size:13px;display:block;margin-bottom:6px">${tt('ocr.action')} — ${tt('actions.done')}</label><textarea id="oOut" class="input" style="min-height:240px;font-family:ui-monospace,monospace;font-size:13px;white-space:pre-wrap" readonly>${results.replace(/[<>&]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</textarea><div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-outline" style="flex:1" id="oCopy">${tt('ocr.copy')}</button><button class="btn" style="flex:1" id="oDl">${svg('arrowDown')} ${tt('ocr.download')}</button></div></div>`:''}
+        <p style="font-size:12px;color:var(--muted);margin:10px 0 0">${tt('ocr.note')}</p>
+      </div>`;
+    document.getElementById('oClr').onclick = () => { file=null; pdf=null; results=''; paint(); };
+    document.getElementById('oLang').onchange = e => lang = e.target.value;
+    document.getElementById('oRun').onclick = doRun;
+    if (results){
+      document.getElementById('oCopy').onclick = async () => { try { await navigator.clipboard.writeText(results); toast(tt('ocr.copied')); } catch { toast(tt('errors.generic'),'error'); } };
+      document.getElementById('oDl').onclick = () => {
+        const blob = new Blob([results], {type:'text/plain;charset=utf-8'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href=url; a.download = deriveName(file.name,'ocr').replace(/\.pdf$/i,'.txt');
+        document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      };
+    }
+  }
+
+  async function loadTesseract(){
+    if (window.Tesseract) return window.Tesseract;
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+      s.onload = () => resolve(window.Tesseract);
+      s.onerror = () => reject(new Error('tesseract load failed'));
+      document.head.appendChild(s);
+    });
+  }
+
+  async function doRun(){
+    if (running) return;
+    running = true;
+    const status = document.getElementById('oStatus');
+    const prog = document.getElementById('oProg');
+    const bar = document.getElementById('oProgBar');
+    const btn = document.getElementById('oRun');
+    btn.disabled = true; prog.style.display='block'; bar.style.width='0%';
+    status.textContent = tt('ocr.loading');
+    try {
+      const Tesseract = await loadTesseract();
+      const worker = await Tesseract.createWorker(lang, 1, {
+        logger: m => {
+          if (m.status === 'recognizing text' && typeof m.progress === 'number'){
+            // page progress is mixed with overall — kept lightweight
+          }
+        }
+      });
+      let out = '';
+      for (let i=1; i<=pdf.numPages; i++){
+        status.textContent = `${tt('ocr.processing')} ${i} / ${pdf.numPages}`;
+        const p = await pdf.getPage(i);
+        const vp = p.getViewport({scale:2});
+        const c = document.createElement('canvas');
+        c.width = vp.width; c.height = vp.height;
+        const ctx = c.getContext('2d');
+        await p.render({canvasContext:ctx, viewport:vp, canvas:c}).promise;
+        const { data:{ text } } = await worker.recognize(c);
+        out += `--- ${tt('ocr.pages')} ${i} ---\n${text.trim()}\n\n`;
+        bar.style.width = ((i/pdf.numPages)*100)+'%';
+      }
+      await worker.terminate();
+      results = out.trim();
+      status.textContent = tt('actions.done');
+      toast(tt('actions.done'));
+    } catch(e){
+      console.error(e);
+      status.textContent = '';
+      toast(tt('errors.generic'),'error');
+    } finally {
+      running = false;
+      btn.disabled = false;
+      paint();
+    }
+  }
+
   paint();
 }
 
@@ -1768,7 +2643,7 @@ async function renderExtractText(main){
           <button class="btn btn-sm" id="etdl">${svg('download')} ${tt('extractText.download')}</button>
         </div>
       </div>
-      ${text ? `<textarea class="textarea" style="height:480px;font-family:ui-monospace,monospace;font-size:13px" readonly>${escapeHtml(text)}</textarea>` : `<p style="color:var(--muted);text-align:center;padding:30px 0">${tt('extractText.empty')}</p>`}
+      ${text ? `<textarea class="textarea" dir="auto" style="height:480px;font-family:ui-monospace,'Segoe UI',Tahoma,sans-serif;font-size:14px;unicode-bidi:plaintext;line-height:1.6" readonly>${escapeHtml(text)}</textarea>` : `<p style="color:var(--muted);text-align:center;padding:30px 0">${tt('extractText.empty')}</p>`}
     `;
     if (text){
       document.getElementById('etcp').onclick = () => { navigator.clipboard.writeText(text); toast(tt('extractText.copied')); };
@@ -1784,7 +2659,7 @@ async function renderExtractText(main){
       for (let i=1; i<=pdf.numPages; i++){
         const p = await pdf.getPage(i);
         const c = await p.getTextContent();
-        out += c.items.map(it => it.str).join(' ') + '\n\n';
+        out += extractPageText(c) + '\n\n';
       }
       text = out.trim();
       paint();
@@ -1792,7 +2667,108 @@ async function renderExtractText(main){
   }
   paint();
 }
+
+/* Arabic-aware page text extraction.
+   PDF.js typically returns Arabic text items where:
+   - Each item's `str` is in the order glyphs appear in the PDF stream.
+   - For Arabic that was rendered using presentation-form glyphs (FExx/FBxx),
+     this stream order is the visual left-to-right glyph order, which means
+     the characters are in REVERSE LOGICAL order. We detect this and reverse
+     the string within those items.
+   - Within a line we sort items by X. For RTL lines we then reverse the
+     item order so the right-most item (logical first) comes first.
+   - We expand lam-alef ligatures and strip tatweel.
+   - The output is in proper Unicode logical order. The textarea uses
+     `dir=auto` + `unicode-bidi:plaintext` so the browser renders it correctly. */
+function extractPageText(content){
+  const isArabicChar = ch => {
+    const code = ch.codePointAt(0);
+    return (code>=0x0600 && code<=0x06FF) || (code>=0xFB50 && code<=0xFDFF) || (code>=0xFE70 && code<=0xFEFF);
+  };
+  const hasPresentationForms = s => /[\uFB50-\uFDFF\uFE70-\uFEFF]/.test(s);
+
+  // Build raw items: { str, x, y, w, h, isAr, wasVisual }
+  const items = content.items.filter(it => it && it.str != null).map(it => {
+    const tr = it.transform || [1,0,0,1,0,0];
+    const raw = it.str || '';
+    const wasVisual = hasPresentationForms(raw);
+    let str = normalizeArabicChars(raw);
+    // If the source used presentation forms, the chars are visually ordered LTR
+    // which equals reverse of logical for RTL — reverse to get logical order.
+    if (wasVisual && /[\u0600-\u06FF]/.test(str)){
+      str = [...str].reverse().join('');
+    }
+    // Expand lam-alef AFTER reversal so the lam stays before alef logically.
+    str = expandLamAlef(str);
+    // Strip tatweel (purely cosmetic kashida elongation)
+    str = str.replace(/\u0640/g, '');
+    return { str, x: tr[4], y: tr[5], w: it.width||0, h: it.height||Math.abs(tr[3])||10, hasEOL: it.hasEOL };
+  }).filter(it => it.str.length || it.hasEOL);
+
+  if (!items.length) return '';
+
+  // Group into lines by Y position (PDF y-axis is bottom-up)
+  const lines = [];
+  const sorted = items.slice().sort((a,b) => b.y - a.y);
+  for (const it of sorted){
+    let placed = false;
+    for (const ln of lines){
+      const tol = Math.max(2, ln.h * 0.5);
+      if (Math.abs(ln.y - it.y) <= tol){
+        ln.items.push(it);
+        ln.h = Math.max(ln.h, it.h);
+        placed = true; break;
+      }
+    }
+    if (!placed) lines.push({ y: it.y, h: it.h, items: [it] });
+  }
+
+  const out = [];
+  for (const ln of lines){
+    const lineText = ln.items.map(i => i.str).join('');
+    const arCount = [...lineText].filter(isArabicChar).length;
+    const latCount = [...lineText].filter(c => /[A-Za-z]/.test(c)).length;
+    const isRTL = arCount > 0 && arCount >= latCount;
+    ln.items.sort((a,b) => a.x - b.x);
+    const ordered = isRTL ? ln.items.slice().reverse() : ln.items;
+    let line = '';
+    for (let k=0; k<ordered.length; k++){
+      const it = ordered[k];
+      if (k > 0){
+        const prev = ordered[k-1];
+        const gap = isRTL ? (prev.x - (it.x + it.w)) : (it.x - (prev.x + prev.w));
+        const avgChar = Math.max(2, (prev.w / Math.max(1, prev.str.length)));
+        if (gap > avgChar * 0.3 && !/\s$/.test(line) && !/^\s/.test(it.str)) line += ' ';
+      }
+      line += it.str;
+    }
+    out.push(line.trim());
+  }
+  return out.join('\n');
+}
+
+/* Normalize Arabic characters: convert presentation forms back to base
+   letters using NFKC, plus a few targeted patches. Does not change ordering. */
+function normalizeArabicChars(s){
+  if (!s) return s;
+  let out;
+  try { out = s.normalize('NFKC'); } catch { out = s; }
+  return out;
+}
+/* Expand lam-alef ligatures (FEFB–FEFC etc.) back to two characters. NFKC
+   already handles most of them, but some PDFs use the compatibility forms
+   which need explicit mapping. */
+function expandLamAlef(s){
+  return s
+    .replace(/[\uFEFB\uFEFC]/g, '\u0644\u0627')
+    .replace(/[\uFEF7\uFEF8]/g, '\u0644\u0623')
+    .replace(/[\uFEF9\uFEFA]/g, '\u0644\u0625')
+    .replace(/[\uFEF5\uFEF6]/g, '\u0644\u0622');
+}
+function normalizeArabic(s){ return expandLamAlef(normalizeArabicChars(s||'').replace(/\u0640/g,'')); }
+
 function escapeHtml(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function hexToRgb(c){ const m=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(c||''); if (!m) return [0.1,0.1,0.3]; return [parseInt(m[1],16)/255,parseInt(m[2],16)/255,parseInt(m[3],16)/255]; }
 
 /* ================== Boot ================== */
 applyTheme();
