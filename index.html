@@ -294,21 +294,6 @@
   .sig-upload-label{display:flex; flex-direction:column; align-items:center; gap:10px; cursor:pointer; color:var(--muted)}
   .sig-upload-label svg{width:32px; height:32px}
   .sig-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:16px}
-  
-  /* AI Assistant Styles */
-  .ai-chat-wrap{display:flex; flex-direction:column; height:500px; background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden}
-  .ai-chat-header{padding:12px 16px; background:var(--primary); color:#fff; display:flex; align-items:center; gap:10px; font-weight:600}
-  .ai-chat-header svg{width:20px; height:20px; flex-shrink:0}
-  .ai-chat-messages{flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; background:var(--bg)}
-  .msg{max-width:85%; padding:10px 14px; border-radius:12px; font-size:14px; line-height:1.5; position:relative}
-  .msg.user{align-self:flex-end; background:var(--primary); color:#fff; border-bottom-right-radius:2px}
-  .msg.ai{align-self:flex-start; background:var(--card); border:1px solid var(--border); border-bottom-left-radius:2px}
-  .ai-chat-input{padding:12px; background:var(--card); border-top:1px solid var(--border); display:flex; gap:8px}
-  .ai-badge{display:inline-flex; align-items:center; gap:4px; padding:2px 8px; background:linear-gradient(135deg, #6366f1, #a855f7); color:#fff; border-radius:20px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px}
-  .ai-tool-card{border:1px solid var(--border); border-radius:12px; padding:16px; transition:all .2s; cursor:pointer; background:var(--card)}
-  .ai-tool-card:hover{border-color:var(--primary); transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.05)}
-  .ai-tool-icon{width:40px; height:40px; border-radius:10px; background:var(--primary-soft); color:var(--primary); display:flex; align-items:center; justify-content:center; margin-bottom:12px}
-  .ai-tool-icon svg{width:20px; height:20px}
 
   /* Result panel */
   .result{
@@ -525,7 +510,6 @@ import * as pdfjsLib from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/
 import JSZip from 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm';
 import SignaturePad from 'https://cdn.jsdelivr.net/npm/signature_pad@4.2.0/+esm';
 import mammoth from 'https://cdn.jsdelivr.net/npm/mammoth@1.8.0/+esm';
-import Tesseract from 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/+esm';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.worker.min.mjs';
 
@@ -533,7 +517,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dis
 const I18N = {
   ar: {
     appName:"بي دي إف ستوديو",
-	    nav:{popular:"PDF الشائعة", organize:"تنظيم PDF", convert:"تحويل PDF", edit:"تعديل", sign:"توقيع", secure:"أمان", ai:"الذكاء الاصطناعي", about:"عن التطبيق"},
+    nav:{popular:"PDF الشائعة", organize:"تنظيم PDF", convert:"تحويل PDF", edit:"تعديل", sign:"توقيع", secure:"أمان", about:"عن التطبيق"},
     footer:{
       tag:"كل ملفاتك تبقى في متصفحك.",
       copyright:"بي دي إف ستوديو — أداة مجانية مفتوحة، تعمل بالكامل في المتصفح.",
@@ -574,22 +558,22 @@ const I18N = {
       s3Title:"حمّل النتيجة",
       s3Body:"اضغط زر التنزيل، وستحصل على ملفك الجديد فورًا، دون أي بصمة على أي خادم."
     },
-	    faq:{
-	      title:"الأسئلة الشائعة",
-	      subtitle:"إجابات سريعة على أكثر ما يُسأل",
-	      q1:"هل يتم رفع ملفاتي إلى الإنترنت؟",
-	      a1:"لا. معظم الأدوات تعمل بالكامل في متصفحك. ميزات الذكاء الاصطناعي فقط هي التي ترسل نص المستند بشكل آمن للمعالجة.",
-	      q2:"ماذا يمكن للمساعد الذكي أن يفعل؟",
-	      a2:"يمكنه تلخيص المستندات الطويلة، الإجابة على أسئلة محددة حول المحتوى، استخراج الكلمات المفتاحية، وتحسين صياغة النصوص بشكل احترافي.",
-	      q3:"هل بي دي إف ستوديو مجاني تمامًا؟",
-	      a3:"نعم، كل الأدوات مجانية بدون قيود يومية، بدون تسجيل، وبدون اشتراك.",
-	      q4:"ما حدود حجم الملف؟",
-	      a4:"لأن المعالجة تحدث في المتصفح، يعتمد الحد على ذاكرة جهازك. الملفات حتى عدة مئات من الميغابايت تعمل عادةً بسلاسة.",
-	      q5:"هل يدعم الموقع اللغة العربية؟",
-	      a5:"نعم، الواجهة والمساعد الذكي يدعمان العربية بشكل كامل، بما في ذلك فهم المحتوى والرد عليه.",
-	      q6:"هل أحتاج اتصال إنترنت؟",
-	      a6:"تحتاجه لفتح الصفحة واستخدام ميزات الذكاء الاصطناعي. باقي الأدوات تعمل بدون اتصال."
-	    },
+    faq:{
+      title:"الأسئلة الشائعة",
+      subtitle:"إجابات سريعة على أكثر ما يُسأل",
+      q1:"هل يتم رفع ملفاتي إلى الإنترنت؟",
+      a1:"لا. كل أداة هنا تعمل بالكامل في متصفحك باستخدام جافاسكربت محلية. لا يوجد خادم يستلم ملفاتك أو يخزنها.",
+      q2:"هل بي دي إف ستوديو مجاني تمامًا؟",
+      a2:"نعم، كل الأدوات مجانية بدون قيود يومية، بدون تسجيل، وبدون اشتراك.",
+      q3:"ما حدود حجم الملف؟",
+      a3:"لأن المعالجة تحدث في المتصفح، يعتمد الحد على ذاكرة جهازك. الملفات حتى عدة مئات من الميغابايت تعمل عادةً بسلاسة.",
+      q4:"هل يدعم الموقع اللغة العربية؟",
+      a4:"نعم، الواجهة بالعربية والإنجليزية، واستخراج النص يعالج الأحرف العربية والاتجاه RTL تلقائيًا.",
+      q5:"هل أحتاج اتصال إنترنت؟",
+      a5:"تحتاجه فقط لفتح الصفحة أول مرة. بعدها يمكنك استخدام جميع الأدوات بدون اتصال.",
+      q6:"هل يمكنني حماية ملف PDF بكلمة مرور؟",
+      a6:"حاليًا أداة الحماية معطّلة لأن مكتبات تشفير PDF داخل المتصفح غير موثوقة بما يكفي. أداة فك الحماية تعمل لإزالة كلمات المرور من ملفاتك."
+    },
     actions:{
       browse:"اختر ملفًا أو أفلته هنا",
       browseMulti:"اختر عدة ملفات أو أفلتها هنا",
@@ -604,9 +588,8 @@ const I18N = {
       prev:"السابق",
       remove:"إزالة"
     },
-	    tools:{
-	      ai:{name:"المساعد الذكي", desc:"دردش مع ملفاتك، لخصها، واستخرج المعلومات بالذكاء الاصطناعي"},
-	      viewer:{name:"عارض PDF", desc:"افتح واقرأ أي ملف PDF بسهولة"},
+    tools:{
+      viewer:{name:"عارض PDF", desc:"افتح واقرأ أي ملف PDF بسهولة"},
       merge:{name:"دمج الملفات", desc:"اجمع عدة ملفات في مستند واحد"},
       split:{name:"تقسيم PDF", desc:"استخرج صفحات أو قسّم لعدة ملفات"},
       compress:{name:"ضغط", desc:"قلّل حجم الملف مع الحفاظ على الجودة"},
@@ -647,7 +630,7 @@ const I18N = {
   },
   en: {
     appName:"PDF Studio",
-	    nav:{popular:"Popular PDF", organize:"Organize PDF", convert:"Convert PDF", edit:"Edit", sign:"Sign", secure:"Security", ai:"AI Tools", about:"About"},
+    nav:{popular:"Popular PDF", organize:"Organize PDF", convert:"Convert PDF", edit:"Edit", sign:"Sign", secure:"Security", about:"About"},
     footer:{
       tag:"Your files never leave your browser.",
       copyright:"PDF Studio — a free, open tool that runs entirely in your browser.",
@@ -688,22 +671,22 @@ const I18N = {
       s3Title:"Download the result",
       s3Body:"Click download to get your new file instantly — without ever touching a server."
     },
-	    faq:{
-	      title:"FAQ",
-	      subtitle:"Quick answers to common questions",
-	      q1:"Are my files uploaded to the internet?",
-	      a1:"No. Most tools run entirely in your browser. Only AI features securely send document text for processing.",
-	      q2:"What can the AI Assistant do?",
-	      a2:"It can summarize long documents, answer specific questions about the content, extract keywords, and professionally improve text phrasing.",
-	      q3:"Is PDF Studio completely free?",
-	      a3:"Yes, all tools are free with no daily limits, no registration, and no subscription.",
-	      q4:"What are the file size limits?",
-	      a4:"Since processing happens in the browser, the limit depends on your device's memory. Files up to several hundred MBs usually work smoothly.",
-	      q5:"Does the site support Arabic?",
-	      a5:"Yes, the interface and AI assistant fully support Arabic, including content understanding and replies.",
-	      q6:"Do I need an internet connection?",
-	      a6:"You need it to open the page and use AI features. Other tools work offline."
-	    },
+    faq:{
+      title:"Frequently Asked Questions",
+      subtitle:"Quick answers to the things people ask the most",
+      q1:"Are my files uploaded anywhere?",
+      a1:"No. Every tool here runs entirely in your browser using local JavaScript. No server ever receives or stores your files.",
+      q2:"Is PDF Studio really free?",
+      a2:"Yes — every tool is free with no daily limits, no signup, and no subscription.",
+      q3:"What's the file size limit?",
+      a3:"Since processing happens in your browser, the limit depends on your device's memory. Files up to a few hundred MB usually work smoothly.",
+      q4:"Does it support Arabic?",
+      a4:"Yes. The interface is bilingual (Arabic + English) and text extraction handles Arabic characters and RTL direction automatically.",
+      q5:"Do I need an internet connection?",
+      a5:"Only the first time you load the page. After that, every tool works offline.",
+      q6:"Can I password-protect a PDF?",
+      a6:"For now the protect tool is disabled because in-browser PDF encryption libraries are not trustworthy enough. The unlock tool does work to remove passwords from your own files."
+    },
     actions:{
       browse:"Pick a file or drop it here",
       browseMulti:"Pick multiple files or drop them here",
@@ -718,9 +701,9 @@ const I18N = {
       prev:"Previous",
       remove:"Remove"
     },
-	    tools:{
-	      ai:{name:"AI Assistant", desc:"Chat with your PDFs, summarize, and extract info with AI"},
-	      viewer:{name:"PDF Viewer", desc:"Open and read any PDF easily"},   merge:{name:"Merge PDFs", desc:"Combine multiple PDFs into one"},
+    tools:{
+      viewer:{name:"View PDF", desc:"Open and read any PDF easily"},
+      merge:{name:"Merge PDFs", desc:"Combine multiple PDFs into one"},
       split:{name:"Split PDF", desc:"Extract pages or split into files"},
       compress:{name:"Compress", desc:"Shrink file size, keep quality"},
       organize:{name:"Organize Pages", desc:"Reorder, rotate, delete pages"},
@@ -943,168 +926,6 @@ async function loadPdfJs(buf, password){
   return await pdfjsLib.getDocument({data:new Uint8Array(buf), password}).promise;
 }
 
-/* ================== AI ASSISTANT HELPERS ================== */
-async function callAI(prompt, context = "") {
-  const query = prompt.trim().toLowerCase();
-  const cleanContext = context.replace(/__SCANNED_PDF__/g, "").trim();
-  
-  if (!cleanContext || cleanContext.length < 10) {
-    return LANG === 'ar' ? "لم أتمكن من العثور على نص كافٍ في الملف لتحليله. يرجى التأكد من أن الملف يحتوي على نصوص واضحة." : "I couldn't find enough text in the file to analyze. Please ensure the file contains clear text.";
-  }
-
-  const paragraphs = cleanContext.split(/\n\s*\n/).filter(p => p.trim().length > 10);
-  const sentences = cleanContext.split(/[.!?\n\u060c]/).filter(s => s.trim().length > 15);
-
-  // 1. Priority: Summary Commands
-  const isSummaryRequest = query.includes("لخص") || query.includes("تلخيص") || query.includes("ملخص") || query.includes("summarize") || query.includes("summary");
-  
-  if (isSummaryRequest) {
-    // Advanced Extractive Summarization
-    const words = cleanContext.match(/[\u0600-\u06FF\w]{4,}/g) || [];
-    const freq = {}; 
-    words.forEach(w => { const low = w.toLowerCase(); freq[low] = (freq[low] || 0) + 1; });
-    
-    const scoredSentences = sentences.map((s, i) => {
-      let score = 0;
-      const sWords = s.toLowerCase().match(/[\u0600-\u06FF\w]{4,}/g) || [];
-      sWords.forEach(w => score += (freq[w] || 0));
-      if (i < 10) score += 100; // Strong boost for opening sentences
-      return { s, score };
-    }).sort((a, b) => b.score - a.score);
-
-    const uniqueSentences = [];
-    const seen = new Set();
-    for (const obj of scoredSentences) {
-      const trimmed = obj.s.trim();
-      if (trimmed.length > 30 && !seen.has(trimmed.substring(0, 20))) {
-        uniqueSentences.push(trimmed);
-        seen.add(trimmed.substring(0, 20));
-      }
-      if (uniqueSentences.length >= 7) break;
-    }
-
-    return (LANG === 'ar' ? "إليك ملخص ذكي لأهم النقاط في المستند:\n\n" : "Here is a smart summary of the key points:\n\n") + 
-           uniqueSentences.map(s => `• ${s}`).join('\n');
-  }
-
-  // 2. Advanced Keywords
-  if (query.includes("keywords") || query.includes("كلمات") || query.includes("مفتاحية")) {
-    const words = context.match(/[\u0600-\u06FF\w]{5,}/g) || [];
-    const freq = {}; words.forEach(w => freq[w] = (freq[w] || 0) + 1);
-    const stopWords = ['هذا','على','في','من','إلى','عن','مع','هذه','كان','كانت','التي','الذي','ان','او','لا','ما','لم','لن','قد','لقد'];
-    const top = Object.keys(freq)
-      .filter(w => !stopWords.includes(w.toLowerCase()))
-      .sort((a, b) => freq[b] - freq[a])
-      .slice(0, 15);
-    return (LANG === 'ar' ? "الكلمات المفتاحية الأكثر أهمية في المستند:\n" : "Most important keywords in the document:\n") + top.join(' • ');
-  }
-
-  // 3. Ultra-Smart Local Search (Fuzzy + Contextual)
-  const queryWords = query.split(/\s+/).filter(w => w.length > 2);
-  
-  // Identify if user is asking for a name or specific entity
-  const isAskingForName = query.includes("من هو") || query.includes("اسم") || query.includes("who is") || query.includes("name");
-
-  const scoredParagraphs = paragraphs.map(p => {
-    let score = 0;
-    const pLow = p.toLowerCase();
-    
-    queryWords.forEach(qw => {
-      // 1. Exact & Partial Match
-      const regex = new RegExp(qw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-      const matches = pLow.match(regex);
-      if (matches) score += matches.length * 10;
-
-      // 2. Fuzzy Match (Simple Levenshtein-like check for small typos)
-      if (!matches && pLow.length < 1000) {
-        const words = pLow.split(/\s+/);
-        words.forEach(pw => {
-          if (pw.length > 3 && (pw.includes(qw) || qw.includes(pw))) score += 5;
-        });
-      }
-    });
-
-    // 3. Name Recognition Boost
-    if (isAskingForName) {
-      // Look for patterns like "Name: X" or "Mr. X" or Arabic name patterns
-      const namePatterns = [/الاسم[:\s]+([^\n]+)/g, /السيد[:\s]+([^\n]+)/g, /الموظف[:\s]+([^\n]+)/g];
-      namePatterns.forEach(pattern => { if (pattern.test(p)) score += 20; });
-    }
-
-    // 4. Contextual Density
-    const uniqueMatches = queryWords.filter(qw => pLow.includes(qw)).length;
-    score *= (1 + uniqueMatches);
-    
-    return { p, score };
-  }).filter(sp => sp.score > 0).sort((a, b) => b.score - a.score);
-
-  if (scoredParagraphs.length > 0) {
-    const bestMatch = scoredParagraphs[0].p.trim();
-    
-    // Find the specific sentence or line within the paragraph that matches the query best
-    const subSentences = bestMatch.split(/[.!?\n\u060c]/).filter(s => s.trim().length > 2);
-    let bestSub = subSentences[0];
-    let maxSubScore = -1;
-
-    subSentences.forEach(s => {
-      let sScore = 0;
-      const sLow = s.toLowerCase();
-      queryWords.forEach(qw => {
-        if (sLow.includes(qw)) sScore += qw.length;
-      });
-      if (sScore > maxSubScore) {
-        maxSubScore = sScore;
-        bestSub = s;
-      }
-    });
-
-    return bestSub.trim();
-  }
-
-  return LANG === 'ar' ? "لم أجد معلومة دقيقة. حاول كتابة الاسم أو الكلمة الأساسية بوضوح." : "No precise info found. Try typing the name or keyword clearly.";
-}
-
-async function runLocalOCR(pdf) {
-  let fullText = "";
-  const worker = await Tesseract.createWorker(LANG === 'ar' ? 'ara+eng' : 'eng');
-  for (let i = 1; i <= Math.min(pdf.numPages, 10); i++) {
-    const page = await pdf.getPage(i);
-    const viewport = page.getViewport({ scale: 2 });
-    const canvas = document.createElement('canvas');
-    canvas.width = viewport.width; canvas.height = viewport.height;
-    await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-    const { data: { text } } = await worker.recognize(canvas);
-    fullText += text + "\n";
-  }
-  await worker.terminate();
-  return fullText;
-}
-
-async function getPdfText(file) {
-  try {
-    const pdf = await loadPdfJs(await file.arrayBuffer());
-    let fullText = "";
-    // Read up to 20 pages for better context
-    const maxPages = Math.min(pdf.numPages, 20);
-    for (let i = 1; i <= maxPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      // Better text joining with proper spacing
-      const pageText = content.items.map(it => it.str).join(" ");
-      fullText += pageText + "\n\n";
-    }
-    
-    const cleanText = fullText.trim();
-    if (cleanText.length < 20) {
-      return "__SCANNED_PDF__";
-    }
-    return cleanText;
-  } catch (e) {
-    console.error("PDF Text Extraction Error:", e);
-    return "__SCANNED_PDF__";
-  }
-}
-
 function openSignatureModal(onConfirm) {
   const title = LANG === 'ar' ? 'إضافة توقيع' : 'Add Signature';
   const body = `
@@ -1307,19 +1128,18 @@ const ROUTES = {
   rotate: renderRotate,
   watermark: renderWatermark,
   sign: renderSign,
-	  annotate: renderAnnotate,
-	  protect: renderProtect,
-	  unlock: renderUnlock,
-	  jpgToPdf: renderJpgToPdf,
-	  pdfToJpg: renderPdfToJpg,
-	  extractText: renderExtractText,
-	  crop: renderCrop,
-	  ocr: renderOcr,
-	  repair: renderRepair,
-	  number: renderNumber,
-	  wordToPdf: renderWordToPdf,
-	  ai: renderAiAssistant
-	};
+  annotate: renderAnnotate,
+  protect: renderProtect,
+  unlock: renderUnlock,
+  jpgToPdf: renderJpgToPdf,
+  pdfToJpg: renderPdfToJpg,
+  extractText: renderExtractText,
+  crop: renderCrop,
+  ocr: renderOcr,
+  repair: renderRepair,
+  number: renderNumber,
+  wordToPdf: renderWordToPdf
+};
 let currentRoute = 'home';
 let routeState = null;
 window.nav = (route, state=null) => {
@@ -1388,12 +1208,11 @@ function renderHome(main){
   // Popular tools shown like iLovePDF
   const popular = ['merge','split','compress','organize','sign','watermark','annotate','ocr'];
     const sections = [
-	    {key:'organize', tools:['merge','split','organize','rotate','compress','crop']},
-	    {key:'edit', tools:['sign','annotate','watermark','number']},
-	    {key:'convert', tools:['jpgToPdf','pdfToJpg','extractText','ocr','viewer','wordToPdf']},
-	    {key:'secure', tools:['protect','unlock','repair']},
-	    {key:'ai', tools:['ai']}
-	  ];
+    {key:'organize', tools:['merge','split','organize','rotate','compress','crop']},
+    {key:'edit', tools:['sign','annotate','watermark','number']},
+    {key:'convert', tools:['jpgToPdf','pdfToJpg','extractText','ocr','viewer','wordToPdf']},
+    {key:'secure', tools:['protect','unlock','repair']}
+  ];
   const badges = [
     {key:'private', icon:'shield'},
     {key:'fast', icon:'bolt'},
@@ -2905,138 +2724,6 @@ function renderWordToPdf(main){
       } finally { btn.disabled = false; }
     };
   }
-	  paint();
-	}
-
-/* ================== AI ASSISTANT ================== */
-function renderAiAssistant(main) {
-  main.innerHTML = `<div class="tool-page" style="max-width:1000px">
-    <div class="tool-head">
-      <div class="tool-icon" style="background:linear-gradient(135deg, #6366f1, #a855f7); color:#fff">${svg('bolt')}</div>
-      <div>
-        <h1>${tt('tools.ai.name')} <span class="ai-badge">Beta</span></h1>
-        <p>${tt('tools.ai.desc')}</p>
-      </div>
-    </div>
-    <div id="aicard"></div>
-  </div>`;
-  
-  const card = document.getElementById('aicard');
-  let file = null, pdfText = "", messages = [];
-
-  function paint() {
-    if (!file) {
-      card.innerHTML = `<div class="card">${dropzone({onFiles: async fs => { 
-        file = fs[0]; 
-        card.innerHTML = `<div class="loading"><div class="spinner"></div><p>${LANG==='ar'?'جارٍ قراءة الملف وتحليله...':'Reading and analyzing file...'}</p></div>`;
-        const pdf = await loadPdfJs(await file.arrayBuffer());
-        pdfText = await getPdfText(file);
-        
-        let welcomeMsg = LANG==='ar' ? `مرحباً! أنا مساعدك الذكي. لقد قرأت ملف "${file.name}". كيف يمكنني مساعدتك اليوم؟` : `Hello! I'm your AI assistant. I've read "${file.name}". How can I help you today?`;
-        
-        if (pdfText === "__SCANNED_PDF__") {
-          card.innerHTML = `<div class="loading"><div class="spinner"></div><p>${LANG==='ar'?'يبدو أن الملف ممسوح ضوئياً، جارٍ تشغيل OCR المحلي...':'Scanned PDF detected, running local OCR...'}</p></div>`;
-          try {
-            pdfText = await runLocalOCR(pdf);
-            welcomeMsg = LANG==='ar' ? `تم التعرف على النص بنجاح باستخدام OCR المحلي! كيف يمكنني مساعدتك في تحليل "${file.name}"؟` : `Text recognized successfully using local OCR! How can I help you analyze "${file.name}"?`;
-          } catch (e) {
-            welcomeMsg = LANG==='ar' ? `فشل OCR المحلي في قراءة هذا الملف. يرجى التأكد من جودة الصورة.` : `Local OCR failed to read this file. Please check the image quality.`;
-          }
-        }
-        
-        messages = [{role:'ai', content: welcomeMsg}];
-        paint(); 
-      }})}</div>`;
-      return;
-    }
-
-    card.innerHTML = `
-      <div style="display:grid;grid-template-columns:1fr 350px;gap:20px" id="aiGrid">
-        <div class="ai-chat-wrap">
-          <div class="ai-chat-header">${svg('bolt', 'width="20" height="20"')} ${LANG==='ar'?'المساعد الشخصي الذكي':'Personal AI Assistant'}</div>
-          <div class="ai-chat-messages" id="aiMsgs">
-            ${messages.map(m => `<div class="msg ${m.role}">${m.content}</div>`).join('')}
-          </div>
-          <div class="ai-chat-input">
-            <input type="text" class="input" id="aiIn" placeholder="${LANG==='ar'?'اسأل عن محتوى الملف...':'Ask about the file content...'}" />
-            <button class="btn" id="aiSend">${svg('arrowDown', 'style="transform:rotate(-90deg); width:16px; height:16px;"')}</button>
-          </div>
-        </div>
-        <div class="ai-sidebar">
-          <div class="card" style="margin-bottom:16px">
-            <h4 style="margin-bottom:12px">${LANG==='ar'?'إجراءات سريعة':'Quick Actions'}</h4>
-            <div style="display:flex;flex-direction:column;gap:10px">
-              <button class="btn btn-outline btn-sm" onclick="window.__ai_action('summarize')">${svg('extractText')} ${LANG==='ar'?'تلخيص المستند':'Summarize Document'}</button>
-              <button class="btn btn-outline btn-sm" onclick="window.__ai_action('keywords')">${svg('view')} ${LANG==='ar'?'استخراج الكلمات المفتاحية':'Extract Keywords'}</button>
-              <button class="btn btn-outline btn-sm" onclick="window.__ai_action('improve')">${svg('annotate')} ${LANG==='ar'?'تحسين الصياغة':'Improve Phrasing'}</button>
-            </div>
-          </div>
-          <div class="card" style="margin-bottom:16px">
-            <h4 style="margin-bottom:8px">${LANG==='ar'?'الذكاء الاصطناعي الشخصي':'Personal AI'}</h4>
-            <p style="font-size:12px;color:var(--muted)">${LANG==='ar'?'يعمل هذا المساعد محلياً بالكامل على جهازك لضمان خصوصية ملفاتك 100%.':'This assistant works entirely locally on your device to ensure 100% privacy.'}</p>
-            <div style="margin-top:10px; padding:8px; background:rgba(99,102,241,0.1); border-radius:6px; font-size:11px; color:var(--primary)">
-              ${LANG==='ar'?'وضع الخصوصية مفعل: لا يتم إرسال أي بيانات للخارج.':'Privacy Mode Active: No data is sent externally.'}
-            </div>
-          </div>
-          <div class="card">
-            <h4 style="margin-bottom:8px">${LANG==='ar'?'معلومات الملف':'File Info'}</h4>
-            <p style="font-size:13px;color:var(--muted)">${file.name}</p>
-            <button class="btn btn-ghost btn-sm btn-block" style="margin-top:10px" onclick="window.__ai_reset()">${tt('actions.clear')}</button>
-          </div>
-        </div>
-      </div>
-    `;
-    
-    if (innerWidth < 800) document.getElementById('aiGrid').style.gridTemplateColumns = '1fr';
-    
-    const msgs = document.getElementById('aiMsgs');
-    msgs.scrollTop = msgs.scrollHeight;
-    
-    const input = document.getElementById('aiIn');
-    input.onkeydown = e => { if(e.key==='Enter') send(); };
-    document.getElementById('aiSend').onclick = send;
-  }
-
-  async function send() {
-    const input = document.getElementById('aiIn');
-    const val = input.value.trim();
-    if (!val) return;
-    
-    messages.push({role:'user', content: val});
-    input.value = '';
-    paint();
-    
-    const aiMsg = {role:'ai', content: '<div class="spinner" style="width:14px;height:14px;border-width:2px"></div>'};
-    messages.push(aiMsg);
-    paint();
-    
-    const response = await callAI(val, pdfText);
-    
-    messages[messages.length-1].content = response;
-    paint();
-  }
-
-  window.__ai_action = async (type) => {
-    let prompt = "";
-    if (type === 'summarize') prompt = "Please provide a concise summary of this document in bullet points.";
-    else if (type === 'keywords') prompt = "Extract the top 5-10 keywords or main topics from this document.";
-    else if (type === 'improve') prompt = "Analyze the writing style and suggest 3 ways to make it more professional.";
-    
-    messages.push({role:'user', content: LANG==='ar' ? `قم بـ ${type==='summarize'?'تلخيص المستند':type==='keywords'?'استخراج الكلمات المفتاحية':'تحسين الصياغة'}` : `Please ${type}.`});
-    paint();
-    
-    const aiMsg = {role:'ai', content: '<div class="spinner" style="width:14px;height:14px;border-width:2px"></div>'};
-    messages.push(aiMsg);
-    paint();
-    
-    const response = await callAI(prompt, pdfText);
-    messages[messages.length-1].content = response;
-    paint();
-  };
-
-  window.__ai_reset = () => { file = null; pdfText = ""; messages = []; paint(); };
-  // OpenAI key saving removed for Personal AI mode
-
   paint();
 }
 
