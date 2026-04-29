@@ -952,18 +952,27 @@ async function callAI(prompt, systemPrompt = "You are a helpful PDF assistant.")
     // We simulate the AI response for the demo to ensure it works without external key errors
     // In a live deployment, this would call the secure backend endpoint.
     
-    // If it's a summary request
-    if (prompt.toLowerCase().includes("summarize") || prompt.includes("تلخيص")) {
+    // Check for specific tasks in the prompt
+    const isSummary = prompt.toLowerCase().includes("summarize") || prompt.includes("تلخيص");
+    const isKeywords = prompt.toLowerCase().includes("keywords") || prompt.includes("الكلمات المفتاحية");
+    const isImprove = prompt.toLowerCase().includes("improve") || prompt.includes("تحسين");
+
+    if (isSummary) {
       return LANG === 'ar' ? 
         "بناءً على تحليل المستند، إليك ملخص لأهم النقاط:\n1. يتناول المستند موضوعات رئيسية تتعلق بالبيانات المرفقة.\n2. يركز على الإجراءات والخطوات العملية المذكورة.\n3. يخلص إلى نتائج وتوصيات تهدف لتحسين سير العمل." :
         "Based on the document analysis, here is a summary of the key points:\n1. The document covers main topics related to the attached data.\n2. It focuses on the practical procedures and steps mentioned.\n3. It concludes with results and recommendations aimed at improving the workflow.";
     }
     
-    // If it's a keywords request
-    if (prompt.toLowerCase().includes("keywords") || prompt.includes("الكلمات المفتاحية")) {
+    if (isKeywords) {
       return LANG === 'ar' ?
         "الكلمات المفتاحية المستخرجة:\n- إدارة المستندات\n- التحليل الذكي\n- الكفاءة التشغيلية\n- التوثيق الرقمي" :
         "Extracted Keywords:\n- Document Management\n- Intelligent Analysis\n- Operational Efficiency\n- Digital Documentation";
+    }
+    
+    if (isImprove) {
+      return LANG === 'ar' ?
+        "مقترحات لتحسين الصياغة:\n1. استخدام لغة أكثر رسمية في المقدمة.\n2. توضيح الأهداف بشكل مباشر في بداية كل فقرة.\n3. تبسيط الجمل الطويلة لزيادة الوضوح." :
+        "Suggestions to improve phrasing:\n1. Use more formal language in the introduction.\n2. State objectives directly at the start of each paragraph.\n3. Simplify long sentences to increase clarity.";
     }
 
     // Default response for chat
@@ -2872,8 +2881,8 @@ function renderAiAssistant(main) {
     messages.push(aiMsg);
     paint();
     
-    const response = await callAI(`Context from PDF: ${pdfText.substring(0, 3000)}\n\nUser Question: ${val}`, 
-      "You are a helpful PDF assistant. Answer based on the provided context. If the answer is not in the context, say you don't know.");
+    const response = await callAI(val, 
+      `Context from PDF: ${pdfText.substring(0, 3000)}\n\nYou are a helpful PDF assistant. Answer based on the provided context. If the answer is not in the context, say you don't know.`);
     
     messages[messages.length-1].content = response;
     paint();
