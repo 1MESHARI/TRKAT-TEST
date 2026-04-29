@@ -525,6 +525,7 @@ import * as pdfjsLib from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/
 import JSZip from 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm';
 import SignaturePad from 'https://cdn.jsdelivr.net/npm/signature_pad@4.2.0/+esm';
 import mammoth from 'https://cdn.jsdelivr.net/npm/mammoth@1.8.0/+esm';
+import Tesseract from 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/+esm';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.worker.min.mjs';
 
@@ -944,11 +945,9 @@ async function loadPdfJs(buf, password){
 
 /* ================== AI ASSISTANT HELPERS ================== */
 async function callAI(prompt, systemPrompt = "") {
-  // Local AI Engine: Analyzes the actual PDF text provided in systemPrompt
   const context = systemPrompt.split('Context from PDF: ')[1]?.split('\n\n')[0] || "";
   const userKey = localStorage.getItem('pdf_studio_openai_key');
 
-  // If user has provided an API key, use real OpenAI
   if (userKey && userKey.startsWith('sk-')) {
     try {
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -964,40 +963,64 @@ async function callAI(prompt, systemPrompt = "") {
     } catch (e) { console.error("OpenAI Error:", e); }
   }
 
-  // Fallback: Local Smart Analysis (No API Key needed)
   if (!context) return LANG === 'ar' ? "لم أتمكن من العثور على نص في الملف لتحليله." : "I couldn't find any text in the file to analyze.";
 
-  const sentences = context.split(/[.!?\n]/).filter(s => s.trim().length > 20);
   const query = prompt.toLowerCase();
+  const paragraphs = context.split(/\n\s*\n/).filter(p => p.trim().length > 10);
+  const sentences = context.split(/[.!?\n]/).filter(s => s.trim().length > 15);
 
-  // 1. Handle Summary
+  // 1. Advanced Local Summary
   if (query.includes("summarize") || query.includes("تلخيص") || query.includes("ملخص")) {
-    const summary = sentences.slice(0, 5).map(s => `• ${s.trim()}`).join('\n');
-    return (LANG === 'ar' ? "إليك ملخص لأهم النقاط في المستند:\n" : "Here is a summary of the key points in the document:\n") + summary;
+    const keySentences = sentences.filter(s => s.length > 40 && s.length < 200).slice(0, 8);
+    const summary = keySentences.map(s => `• ${s.trim()}`).join('\n');
+    return (LANG === 'ar' ? "إليك ملخص ذكي لأهم النقاط في المستند:\n\n" : "Here is a smart summary of the key points:\n\n") + summary;
   }
 
-  // 2. Handle Keywords
+  // 2. Advanced Keywords
   if (query.includes("keywords") || query.includes("كلمات") || query.includes("مفتاحية")) {
     const words = context.match(/[\u0600-\u06FF\w]{5,}/g) || [];
     const freq = {}; words.forEach(w => freq[w] = (freq[w] || 0) + 1);
-    const top = Object.keys(freq).sort((a, b) => freq[b] - freq[a]).slice(0, 10);
-    return (LANG === 'ar' ? "الكلمات الأكثر تكراراً وأهمية:\n" : "Most frequent and important words:\n") + top.join(' - ');
+    const stopWords = ['هذا','على','في','من','إلى','عن','مع','هذه','كان','كانت','التي','الذي'];
+    const top = Object.keys(freq)
+      .filter(w => !stopWords.includes(w))
+      .sort((a, b) => freq[b] - freq[a])
+      .slice(0, 12);
+    return (LANG === 'ar' ? "الكلمات المفتاحية الأكثر أهمية:\n" : "Most important keywords:\n") + top.join(' • ');
   }
 
-  // 3. Smart Search (Answer Questions)
-  const matches = sentences.filter(s => {
-    const sLow = s.toLowerCase();
-    return query.split(' ').some(word => word.length > 3 && sLow.includes(word));
-  });
+  // 3. Semantic Search Engine (Local)
+  const queryWords = query.split(/\s+/).filter(w => w.length > 3);
+  const scoredParagraphs = paragraphs.map(p => {
+    let score = 0;
+    const pLow = p.toLowerCase();
+    queryWords.forEach(qw => { if (pLow.includes(qw)) score += 1; });
+    return { p, score };
+  }).filter(sp => sp.score > 0).sort((a, b) => b.score - a.score);
 
-  if (matches.length > 0) {
-    return (LANG === 'ar' ? "وجدت هذه المعلومات المتعلقة بسؤالك في المستند:\n\n" : "I found this information related to your question in the document:\n\n") + 
-           matches.slice(0, 3).join('.\n\n') + ".";
+  if (scoredParagraphs.length > 0) {
+    const bestMatches = scoredParagraphs.slice(0, 2).map(sp => sp.p.trim()).join('\n\n---\n\n');
+    return (LANG === 'ar' ? "بناءً على تحليلي للمستند، وجدت هذه المعلومات:\n\n" : "Based on my analysis, I found this information:\n\n") + bestMatches;
   }
 
   return LANG === 'ar' ? 
-    "عذراً، لم أجد إجابة مباشرة لسؤالك في النص المتاح. يمكنك محاولة صياغة السؤال بشكل مختلف أو استخدام مفتاح OpenAI API للحصول على تحليل أعمق." :
-    "Sorry, I couldn't find a direct answer to your question in the available text. You can try rephrasing your question or use an OpenAI API key for deeper analysis.";
+    "عذراً، لم أجد إجابة مباشرة لسؤالك في النص المتاح. يمكنك محاولة صياغة السؤال بشكل مختلف أو استخدام مفتاح OpenAI API لتحليل أعمق." :
+    "Sorry, I couldn't find a direct answer to your question in the available text. Try rephrasing or use an OpenAI API key for deeper analysis.";
+}
+
+async function runLocalOCR(pdf) {
+  let fullText = "";
+  const worker = await Tesseract.createWorker(LANG === 'ar' ? 'ara+eng' : 'eng');
+  for (let i = 1; i <= Math.min(pdf.numPages, 10); i++) {
+    const page = await pdf.getPage(i);
+    const viewport = page.getViewport({ scale: 2 });
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width; canvas.height = viewport.height;
+    await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+    const { data: { text } } = await worker.recognize(canvas);
+    fullText += text + "\n";
+  }
+  await worker.terminate();
+  return fullText;
 }
 
 async function getPdfText(file) {
@@ -1010,11 +1033,7 @@ async function getPdfText(file) {
     fullText += pageText + "\n";
   }
   
-  // If no text found, it might be a scanned PDF. Try a very basic OCR hint or alert.
   if (fullText.trim().length < 10) {
-    console.log("No text found, possibly a scanned PDF.");
-    // In a real app, we'd trigger Tesseract.js here. 
-    // For now, we'll return a special marker to inform the AI Assistant.
     return "__SCANNED_PDF__";
   }
   return fullText;
@@ -2844,13 +2863,21 @@ function renderAiAssistant(main) {
       card.innerHTML = `<div class="card">${dropzone({onFiles: async fs => { 
         file = fs[0]; 
         card.innerHTML = `<div class="loading"><div class="spinner"></div><p>${LANG==='ar'?'جارٍ قراءة الملف وتحليله...':'Reading and analyzing file...'}</p></div>`;
+        const pdf = await loadPdfJs(await file.arrayBuffer());
         pdfText = await getPdfText(file);
+        
         let welcomeMsg = LANG==='ar' ? `مرحباً! أنا مساعدك الذكي. لقد قرأت ملف "${file.name}". كيف يمكنني مساعدتك اليوم؟` : `Hello! I'm your AI assistant. I've read "${file.name}". How can I help you today?`;
+        
         if (pdfText === "__SCANNED_PDF__") {
-          welcomeMsg = LANG==='ar' ? 
-            `لقد قرأت الملف، ولكن يبدو أنه "نسخة ممسوحة ضوئياً" (صور) ولا يحتوي على نص رقمي. المساعد المحلي قد يواجه صعوبة في تحليله. يفضل استخدام أداة OCR أولاً أو إضافة مفتاح OpenAI لتحليل أدق.` :
-            `I've read the file, but it seems to be a "scanned version" (images) and contains no digital text. The local assistant might struggle to analyze it. Try using the OCR tool first or add an OpenAI key for better analysis.`;
+          card.innerHTML = `<div class="loading"><div class="spinner"></div><p>${LANG==='ar'?'يبدو أن الملف ممسوح ضوئياً، جارٍ تشغيل OCR المحلي...':'Scanned PDF detected, running local OCR...'}</p></div>`;
+          try {
+            pdfText = await runLocalOCR(pdf);
+            welcomeMsg = LANG==='ar' ? `تم التعرف على النص بنجاح باستخدام OCR المحلي! كيف يمكنني مساعدتك في تحليل "${file.name}"؟` : `Text recognized successfully using local OCR! How can I help you analyze "${file.name}"?`;
+          } catch (e) {
+            welcomeMsg = LANG==='ar' ? `فشل OCR المحلي. يمكنك محاولة إضافة مفتاح OpenAI لتحليل الصور.` : `Local OCR failed. You can try adding an OpenAI key for image analysis.`;
+          }
         }
+        
         messages = [{role:'ai', content: welcomeMsg}];
         paint(); 
       }})}</div>`;
