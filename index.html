@@ -2458,8 +2458,8 @@ async function renderAnnotate(main){
       const fnt = await doc.embedFont(StandardFonts.Helvetica);
       const fntB = await doc.embedFont(StandardFonts.HelveticaBold);
       const pages = doc.getPages();
-      anns.forEach(a => {
-        const pg = pages[a.page-1]; if (!pg) return;
+      for (const a of anns) {
+        const pg = pages[a.page-1]; if (!pg) continue;
         const {width, height} = pg.getSize();
         const x = a.x*width, y = height - a.y*height;
         if (a.type==='text'){
@@ -2487,7 +2487,7 @@ async function renderAnnotate(main){
           const w = width*a.w; const h = w*ar;
           pg.drawImage(img, {x:x-w/2, y:y-h/2, width:w, height:h});
         }
-      });
+      }
       // Draw free-draw strokes — each stroke is a series of tiny line segments
       anns.filter(a => a.type==='draw').forEach(a => {
         const pg = pages[a.page-1]; if (!pg) return;
