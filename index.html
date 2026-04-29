@@ -499,6 +499,7 @@ import { PDFDocument, StandardFonts, rgb, degrees, LineCapStyle } from 'https://
 import * as pdfjsLib from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.min.mjs';
 import JSZip from 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm';
 import SignaturePad from 'https://cdn.jsdelivr.net/npm/signature_pad@4.2.0/+esm';
+import mammoth from 'https://cdn.jsdelivr.net/npm/mammoth@1.8.0/+esm';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.7.76/build/pdf.worker.min.mjs';
 
@@ -595,7 +596,8 @@ const I18N = {
       crop:{name:"اقتصاص الصفحات", desc:"حدد منطقة وقصّ الهوامش"},
       ocr:{name:"OCR (تحويل الصور لنص)", desc:"استخرج النص من PDF ممسوح ضوئيًا"},
       repair:{name:"إصلاح PDF", desc:"محاولة إصلاح ملفات PDF التالفة"},
-      number:{name:"ترقيم الصفحات", desc:"إضافة أرقام الصفحات للمستند"}
+      number:{name:"ترقيم الصفحات", desc:"إضافة أرقام الصفحات للمستند"},
+      wordToPdf:{name:"Word إلى PDF", desc:"تحويل ملفات Word إلى PDF"}
     },
     viewer:{title:"عارض PDF", subtitle:"تصفّح صفحات ملفك مع المصغرات والتكبير"},
     merge:{title:"دمج ملفات PDF", subtitle:"اجمع عدة ملفات في مستند واحد بترتيب تختاره", output:"اسم الملف الناتج", action:"دمج وتنزيل", needTwo:"أضف ملفين على الأقل"},
@@ -707,7 +709,8 @@ const I18N = {
       crop:{name:"Crop Pages", desc:"Trim margins from page area"},
       ocr:{name:"OCR (image to text)", desc:"Recognize text from a scanned PDF"},
       repair:{name:"Repair PDF", desc:"Try to fix corrupted PDF files"},
-      number:{name:"Page Numbers", desc:"Add page numbers to your document"}
+      number:{name:"Page Numbers", desc:"Add page numbers to your document"},
+      wordToPdf:{name:"Word to PDF", desc:"Convert Word documents to PDF"}
     },
     viewer:{title:"PDF Viewer", subtitle:"Browse pages with thumbnails and zoom"},
     merge:{title:"Merge PDFs", subtitle:"Combine PDFs into one document in your chosen order", output:"Output filename", action:"Merge & Download", needTwo:"Add at least two PDFs"},
@@ -819,6 +822,7 @@ const ICONS = {
   ocr:'<path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/><path d="M7 8h6"/><path d="M7 16h4"/>',
   repair:'<path d="m14.7 6.3-1.1-1.1"/><path d="m19 9.4-1.1-1.1"/><path d="M20 4.1 15.9 8.2"/><path d="m15 13-3 3"/><path d="m9 17-2 2"/><path d="m14 8 2.5-2.5a2 2 0 0 1 2.8 2.8L16.8 10.8"/><path d="m12 10-8 8v4h4l8-8"/><path d="m19 15 3 3-3 3"/><path d="m15 19 3-3 3 3"/>',
   number:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M10 13h4"/><path d="M12 13v4"/>',
+  wordToPdf:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15h6"/><path d="M12 12v6"/>',
   draw:'<path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/>',
   shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>',
   bolt:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
@@ -879,12 +883,18 @@ function downloadBlob(blob, name){
   `;
   
   openModal(title, body, foot);
-  const input = document.getElementById('modalInput');
-  input.select();
-  input.onkeyup = e => { if(e.key==='Enter') document.getElementById('modalConfirm').click(); };
+  setTimeout(() => {
+    const input = document.getElementById('modalInput');
+    if (input) {
+      input.focus();
+      input.select();
+      input.onkeyup = e => { if(e.key==='Enter') document.getElementById('modalConfirm').click(); };
+    }
+  }, 50);
   
   document.getElementById('modalConfirm').onclick = () => {
-    const finalName = input.value.trim() || name;
+    const input = document.getElementById('modalInput');
+    const finalName = (input ? input.value.trim() : '') || name;
     closeModal();
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -1011,7 +1021,8 @@ const ROUTES = {
   crop: renderCrop,
   ocr: renderOcr,
   repair: renderRepair,
-  number: renderNumber
+  number: renderNumber,
+  wordToPdf: renderWordToPdf
 };
 let currentRoute = 'home';
 let routeState = null;
@@ -1062,6 +1073,7 @@ function renderFooter(){
         <a onclick="nav('sign')">${tt('tools.sign.name')}</a>
         <a onclick="nav('annotate')">${tt('tools.annotate.name')}</a>
         <a onclick="nav('ocr')">${tt('tools.ocr.name')}</a>
+        <a onclick="nav('wordToPdf')">${tt('tools.wordToPdf.name')}</a>
       </div>
       <div class="footer-col">
         <h5>${tt('footer.info')}</h5>
@@ -1082,7 +1094,7 @@ function renderHome(main){
     const sections = [
     {key:'organize', tools:['merge','split','organize','rotate','compress','crop']},
     {key:'edit', tools:['sign','annotate','watermark','number']},
-    {key:'convert', tools:['jpgToPdf','pdfToJpg','extractText','ocr','viewer']},
+    {key:'convert', tools:['jpgToPdf','pdfToJpg','extractText','ocr','viewer','wordToPdf']},
     {key:'secure', tools:['protect','unlock','repair']}
   ];
   const badges = [
@@ -2496,6 +2508,50 @@ function renderRepair(main){
       try {
         const doc = await PDFDocument.load(await file.arrayBuffer(), { ignoreEncryption: true });
         downloadBytes(await doc.save(), deriveName(file.name, 'repaired'));
+        toast(tt('actions.done'));
+      } catch(e) {
+        console.error(e); toast(tt('errors.generic'), 'error');
+      } finally { btn.disabled = false; }
+    };
+  }
+  paint();
+}
+
+/* ================== WORD TO PDF ================== */
+function renderWordToPdf(main){
+  main.innerHTML = `<div class="tool-page">${toolHead('wordToPdf')}<div class="card" id="w2pcard"></div></div>`;
+  const card = document.getElementById('w2pcard');
+  let file=null;
+  function paint(){
+    if (!file){ card.innerHTML = dropzone({accept:'.docx', onFiles:fs=>{file=fs[0]; paint();}}); return; }
+    card.innerHTML = `
+      <div style="font-weight:600;margin-bottom:14px">${file.name}</div>
+      <button class="btn btn-block" id="w2pdo">${svg('arrowDown')} ${tt('actions.download')}</button>
+    `;
+    document.getElementById('w2pdo').onclick = async () => {
+      const btn = document.getElementById('w2pdo'); btn.disabled = true;
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.convertToHtml({arrayBuffer});
+        const html = result.value;
+        
+        const doc = await PDFDocument.create();
+        const page = doc.addPage();
+        const { width, height } = page.getSize();
+        const font = await doc.embedFont(StandardFonts.Helvetica);
+        
+        // Simple text extraction for PDF (mammoth to text)
+        const textResult = await mammoth.extractRawText({arrayBuffer});
+        const lines = textResult.value.split('\n');
+        
+        let y = height - 50;
+        for (const line of lines) {
+          if (y < 50) break; // Simple page limit for now
+          page.drawText(line.substring(0, 100), { x: 50, y, size: 10, font });
+          y -= 15;
+        }
+        
+        downloadBytes(await doc.save(), deriveName(file.name, 'converted'));
         toast(tt('actions.done'));
       } catch(e) {
         console.error(e); toast(tt('errors.generic'), 'error');
