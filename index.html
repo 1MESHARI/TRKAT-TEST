@@ -282,8 +282,18 @@
   .placement.text input{font:inherit; color:inherit; background:transparent; border:none; outline:none; padding:0; margin:0; min-width:60px; width:auto}
 
   .signature-pad{
-    background:#fff; border:1px solid var(--border); border-radius:9px; height:160px;
+    background:#fff; border:1px solid var(--border); border-radius:9px; height:200px; width:100%; touch-action:none;
   }
+  .sig-tabs{display:flex; background:var(--bg); padding:4px; border-radius:10px; margin-bottom:12px; border:1px solid var(--border)}
+  .sig-tab{flex:1; border:0; background:transparent; padding:8px; border-radius:8px; cursor:pointer; font-weight:600; color:var(--muted); transition:all .2s}
+  .sig-tab.active{background:var(--card); color:var(--primary); box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+  .sig-content{display:none}
+  .sig-content.active{display:block}
+  .sig-input-wrap{padding:20px; background:#fff; border:1px solid var(--border); border-radius:9px; min-height:200px; display:flex; align-items:center; justify-content:center}
+  .sig-text-input{width:100%; border:0; font-size:32px; text-align:center; font-family:'Dancing Script', cursive, serif; outline:none}
+  .sig-upload-label{display:flex; flex-direction:column; align-items:center; gap:10px; cursor:pointer; color:var(--muted)}
+  .sig-upload-label svg{width:32px; height:32px}
+  .sig-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:16px}
 
   /* Result panel */
   .result{
@@ -914,6 +924,112 @@ function toast(msg, type='success'){
 }
 async function loadPdfJs(buf, password){
   return await pdfjsLib.getDocument({data:new Uint8Array(buf), password}).promise;
+}
+
+function openSignatureModal(onConfirm) {
+  const title = LANG === 'ar' ? 'إضافة توقيع' : 'Add Signature';
+  const body = `
+    <div class="sig-tabs">
+      <button class="sig-tab active" data-tab="draw">${LANG === 'ar' ? 'ارسم' : 'Draw'}</button>
+      <button class="sig-tab" data-tab="type">${LANG === 'ar' ? 'اكتب' : 'Type'}</button>
+      <button class="sig-tab" data-tab="upload">${LANG === 'ar' ? 'ارفع' : 'Upload'}</button>
+    </div>
+    <div class="sig-content active" id="sig-draw">
+      <canvas class="signature-pad" id="modalSigPad"></canvas>
+    </div>
+    <div class="sig-content" id="sig-type">
+      <div class="sig-input-wrap">
+        <input type="text" class="sig-text-input" id="modalSigText" placeholder="${LANG === 'ar' ? 'اكتب اسمك هنا' : 'Type your name here'}" />
+      </div>
+    </div>
+    <div class="sig-content" id="sig-upload">
+      <div class="sig-input-wrap">
+        <label class="sig-upload-label">
+          ${svg('upload')}
+          <span>${LANG === 'ar' ? 'اختر صورة التوقيع' : 'Choose signature image'}</span>
+          <input type="file" id="modalSigFile" accept="image/*" style="display:none" />
+        </label>
+      </div>
+    </div>
+  `;
+  const foot = `
+    <button class="btn btn-outline" id="modalSigClear">${LANG === 'ar' ? 'مسح' : 'Clear'}</button>
+    <button class="btn" id="modalSigConfirm">${LANG === 'ar' ? 'اعتماد التوقيع' : 'Confirm Signature'}</button>
+  `;
+  
+  openModal(title, body, foot);
+  
+  let currentTab = 'draw';
+  let pad = null;
+  let uploadedUrl = null;
+  
+  const tabs = document.querySelectorAll('.sig-tab');
+  const contents = document.querySelectorAll('.sig-content');
+  
+  tabs.forEach(tab => {
+    tab.onclick = () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      contents.forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      currentTab = tab.dataset.tab;
+      document.getElementById('sig-' + currentTab).classList.add('active');
+      if (currentTab === 'draw' && !pad) initPad();
+    };
+  });
+  
+  function initPad() {
+    const c = document.getElementById('modalSigPad');
+    c.width = c.offsetWidth; c.height = c.offsetHeight;
+    pad = new SignaturePad(c, {penColor:'#1e1b4b'});
+  }
+  
+  setTimeout(initPad, 100);
+  
+  document.getElementById('modalSigClear').onclick = () => {
+    if (currentTab === 'draw') pad.clear();
+    else if (currentTab === 'type') document.getElementById('modalSigText').value = '';
+    else uploadedUrl = null;
+  };
+  
+  document.getElementById('modalSigFile').onchange = e => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        uploadedUrl = ev.target.result;
+        toast(LANG === 'ar' ? 'تم رفع الصورة' : 'Image uploaded');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  document.getElementById('modalSigConfirm').onclick = () => {
+    let dataUrl = null;
+    if (currentTab === 'draw') {
+      if (!pad.isEmpty()) dataUrl = pad.toDataURL('image/png');
+    } else if (currentTab === 'type') {
+      const val = document.getElementById('modalSigText').value.trim();
+      if (val) {
+        const c = document.createElement('canvas');
+        c.width = 400; c.height = 150;
+        const ctx = c.getContext('2d');
+        ctx.font = "48px 'Dancing Script', cursive, serif";
+        ctx.fillStyle = "#1e1b4b";
+        ctx.textAlign = "center";
+        ctx.fillText(val, 200, 90);
+        dataUrl = c.toDataURL('image/png');
+      }
+    } else {
+      dataUrl = uploadedUrl;
+    }
+    
+    if (dataUrl) {
+      closeModal();
+      onConfirm(dataUrl);
+    } else {
+      toast(LANG === 'ar' ? 'يرجى تقديم توقيع أولاً' : 'Please provide a signature first', 'error');
+    }
+  };
 }
 
 // Web Worker Helper for background processing
@@ -2222,13 +2338,38 @@ async function renderAnnotate(main){
         openModal(title, body, `<button class="btn btn-ghost" onclick="closeModal()">${tt('actions.back')}</button>`);
         
         window.__add_ann = (type, ax, ay) => {
-          closeModal();
           const id = 'a'+Math.random().toString(36).slice(2);
-          if (type === 'text') { if (!textIn.trim()) return; anns.push({id,page,type:'text',x:ax,y:ay,text:textIn,size:textSize,color:textColor}); }
-          else if (type === 'highlight') anns.push({id,page,type:'highlight',x:ax,y:ay,w:0.20,h:0.030,color:hlColor});
-          else if (type === 'stamp') anns.push({id,page,type:'stamp',x:ax,y:ay,kind:stampKind,size:14});
-          else if (type === 'sign') nav('sign');
-          drawPage();
+          if (type === 'text') {
+            const tTitle = LANG === 'ar' ? 'إضافة نص' : 'Add Text';
+            const tBody = `<div class="field"><label>${LANG === 'ar' ? 'اكتب النص هنا:' : 'Type text here:'}</label><textarea class="input" id="modalTextInput" style="height:80px">${textIn}</textarea></div>`;
+            openModal(tTitle, tBody, `<button class="btn btn-outline" onclick="closeModal()">${tt('actions.back')}</button><button class="btn" id="modalTextConfirm">${tt('actions.done')}</button>`);
+            setTimeout(() => document.getElementById('modalTextInput').focus(), 100);
+            document.getElementById('modalTextConfirm').onclick = () => {
+              const val = document.getElementById('modalTextInput').value.trim();
+              if (val) {
+                anns.push({id, page, type:'text', x:ax, y:ay, text:val, size:textSize, color:textColor});
+                closeModal();
+                drawPage();
+              }
+            };
+          } else if (type === 'highlight') {
+            closeModal();
+            anns.push({id,page,type:'highlight',x:ax,y:ay,w:0.20,h:0.030,color:hlColor});
+            drawPage();
+          } else if (type === 'stamp') {
+            closeModal();
+            anns.push({id,page,type:'stamp',x:ax,y:ay,kind:stampKind,size:14});
+            drawPage();
+          } else if (type === 'sign') {
+            openSignatureModal(dataUrl => {
+              // We need to handle signature as an image placement in annotate
+              // For now, let's add it as a special 'stamp' or similar, but the user asked for signature modal
+              // Let's redirect to sign tool or implement signature placement here.
+              // Given the context, let's implement signature placement in annotate:
+              anns.push({id, page, type:'sig', x:ax, y:ay, url:dataUrl, w:0.25});
+              drawPage();
+            });
+          }
         };
       };
     }
@@ -2295,6 +2436,9 @@ async function renderAnnotate(main){
         d.style.color=cc; d.style.borderColor=cc; d.style.background=`${cc}1a`;
         d.style.fontSize=(a.size||14)+'px';
         d.textContent = tt('annotate.'+a.kind);
+      } else if (a.type==='sig'){
+        d.innerHTML = `<img src="${a.url}" style="width:100%;display:block"/>`;
+        d.style.width = (a.w*vp.width)+'px';
       }
       stage.appendChild(d);
       makeInteractive(d, a, {
@@ -2336,6 +2480,12 @@ async function renderAnnotate(main){
           const sw = tw + 28, sh = sz + 14;
           pg.drawRectangle({x:x-sw/2, y:y-sh/2, width:sw, height:sh, borderColor:rgb(r,g,b), borderWidth:3, color:rgb(r,g,b), opacity:.08, borderOpacity:.9});
           pg.drawText(label, {x:x-tw/2, y:y-sz/3, size:sz, font:fntB, color:rgb(r,g,b), opacity:.9});
+        } else if (a.type==='sig'){
+          const sigBytes = await fetch(a.url).then(r=>r.arrayBuffer());
+          const img = await doc.embedPng(sigBytes);
+          const ar = img.height / img.width;
+          const w = width*a.w; const h = w*ar;
+          pg.drawImage(img, {x:x-w/2, y:y-h/2, width:w, height:h});
         }
       });
       // Draw free-draw strokes — each stroke is a series of tiny line segments
