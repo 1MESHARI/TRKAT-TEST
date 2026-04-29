@@ -944,35 +944,28 @@ async function loadPdfJs(buf, password){
 }
 
 /* ================== AI ASSISTANT HELPERS ================== */
-async function callAI(prompt, systemPrompt = "") {
-  const context = systemPrompt.split('Context from PDF: ')[1]?.split('\n\n')[0] || "";
-  const userKey = localStorage.getItem('pdf_studio_openai_key');
-
-  if (userKey && userKey.startsWith('sk-')) {
-    try {
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${userKey}` },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [{ role: "system", content: systemPrompt }, { role: "user", content: prompt }]
-        })
-      });
-      const data = await response.json();
-      if (data.choices) return data.choices[0].message.content;
-    } catch (e) { console.error("OpenAI Error:", e); }
-  }
-
+async function callAI(prompt, context = "") {
   if (!context) return LANG === 'ar' ? "لم أتمكن من العثور على نص في الملف لتحليله." : "I couldn't find any text in the file to analyze.";
 
   const query = prompt.toLowerCase();
   const paragraphs = context.split(/\n\s*\n/).filter(p => p.trim().length > 10);
   const sentences = context.split(/[.!?\n]/).filter(s => s.trim().length > 15);
 
-  // 1. Advanced Local Summary
+  // 1. Advanced Local Summary (Extractive)
   if (query.includes("summarize") || query.includes("تلخيص") || query.includes("ملخص")) {
-    const keySentences = sentences.filter(s => s.length > 40 && s.length < 200).slice(0, 8);
-    const summary = keySentences.map(s => `• ${s.trim()}`).join('\n');
+    // Score sentences based on keywords and position
+    const words = context.match(/[\u0600-\u06FF\w]{5,}/g) || [];
+    const freq = {}; words.forEach(w => freq[w.toLowerCase()] = (freq[w.toLowerCase()] || 0) + 1);
+    
+    const scoredSentences = sentences.map((s, i) => {
+      let score = 0;
+      const sWords = s.toLowerCase().match(/[\u0600-\u06FF\w]{5,}/g) || [];
+      sWords.forEach(w => score += (freq[w] || 0));
+      if (i < 5) score += 50; // Boost early sentences
+      return { s, score };
+    }).sort((a, b) => b.score - a.score);
+
+    const summary = scoredSentences.slice(0, 8).map(obj => `• ${obj.s.trim()}`).join('\n');
     return (LANG === 'ar' ? "إليك ملخص ذكي لأهم النقاط في المستند:\n\n" : "Here is a smart summary of the key points:\n\n") + summary;
   }
 
@@ -980,31 +973,42 @@ async function callAI(prompt, systemPrompt = "") {
   if (query.includes("keywords") || query.includes("كلمات") || query.includes("مفتاحية")) {
     const words = context.match(/[\u0600-\u06FF\w]{5,}/g) || [];
     const freq = {}; words.forEach(w => freq[w] = (freq[w] || 0) + 1);
-    const stopWords = ['هذا','على','في','من','إلى','عن','مع','هذه','كان','كانت','التي','الذي'];
+    const stopWords = ['هذا','على','في','من','إلى','عن','مع','هذه','كان','كانت','التي','الذي','ان','او','لا','ما','لم','لن','قد','لقد'];
     const top = Object.keys(freq)
-      .filter(w => !stopWords.includes(w))
+      .filter(w => !stopWords.includes(w.toLowerCase()))
       .sort((a, b) => freq[b] - freq[a])
-      .slice(0, 12);
-    return (LANG === 'ar' ? "الكلمات المفتاحية الأكثر أهمية:\n" : "Most important keywords:\n") + top.join(' • ');
+      .slice(0, 15);
+    return (LANG === 'ar' ? "الكلمات المفتاحية الأكثر أهمية في المستند:\n" : "Most important keywords in the document:\n") + top.join(' • ');
   }
 
-  // 3. Semantic Search Engine (Local)
-  const queryWords = query.split(/\s+/).filter(w => w.length > 3);
+  // 3. Advanced Local Semantic Search
+  const queryWords = query.split(/\s+/).filter(w => w.length > 2);
   const scoredParagraphs = paragraphs.map(p => {
     let score = 0;
     const pLow = p.toLowerCase();
-    queryWords.forEach(qw => { if (pLow.includes(qw)) score += 1; });
+    queryWords.forEach(qw => {
+      const regex = new RegExp(qw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+      const matches = pLow.match(regex);
+      if (matches) {
+        score += matches.length * qw.length;
+        if (pLow.includes(` ${qw} `)) score += 10; // Exact word bonus
+      }
+    });
+    // Boost paragraphs that contain multiple unique query words
+    const uniqueMatches = queryWords.filter(qw => pLow.includes(qw)).length;
+    score *= (1 + uniqueMatches * 0.5);
+    
     return { p, score };
   }).filter(sp => sp.score > 0).sort((a, b) => b.score - a.score);
 
   if (scoredParagraphs.length > 0) {
-    const bestMatches = scoredParagraphs.slice(0, 2).map(sp => sp.p.trim()).join('\n\n---\n\n');
-    return (LANG === 'ar' ? "بناءً على تحليلي للمستند، وجدت هذه المعلومات:\n\n" : "Based on my analysis, I found this information:\n\n") + bestMatches;
+    const bestMatches = scoredParagraphs.slice(0, 3).map(sp => sp.p.trim()).join('\n\n---\n\n');
+    return (LANG === 'ar' ? "بناءً على تحليلي الشخصي للمستند، وجدت هذه المعلومات:\n\n" : "Based on my personal analysis, I found this information:\n\n") + bestMatches;
   }
 
   return LANG === 'ar' ? 
-    "عذراً، لم أجد إجابة مباشرة لسؤالك في النص المتاح. يمكنك محاولة صياغة السؤال بشكل مختلف أو استخدام مفتاح OpenAI API لتحليل أعمق." :
-    "Sorry, I couldn't find a direct answer to your question in the available text. Try rephrasing or use an OpenAI API key for deeper analysis.";
+    "عذراً، لم أجد إجابة مباشرة لسؤالك في النص المتاح. حاول صياغة السؤال بكلمات مختلفة موجودة في المستند." :
+    "Sorry, I couldn't find a direct answer to your question in the available text. Try using different keywords from the document.";
 }
 
 async function runLocalOCR(pdf) {
@@ -2874,7 +2878,7 @@ function renderAiAssistant(main) {
             pdfText = await runLocalOCR(pdf);
             welcomeMsg = LANG==='ar' ? `تم التعرف على النص بنجاح باستخدام OCR المحلي! كيف يمكنني مساعدتك في تحليل "${file.name}"؟` : `Text recognized successfully using local OCR! How can I help you analyze "${file.name}"?`;
           } catch (e) {
-            welcomeMsg = LANG==='ar' ? `فشل OCR المحلي. يمكنك محاولة إضافة مفتاح OpenAI لتحليل الصور.` : `Local OCR failed. You can try adding an OpenAI key for image analysis.`;
+            welcomeMsg = LANG==='ar' ? `فشل OCR المحلي في قراءة هذا الملف. يرجى التأكد من جودة الصورة.` : `Local OCR failed to read this file. Please check the image quality.`;
           }
         }
         
@@ -2887,7 +2891,7 @@ function renderAiAssistant(main) {
     card.innerHTML = `
       <div style="display:grid;grid-template-columns:1fr 350px;gap:20px" id="aiGrid">
         <div class="ai-chat-wrap">
-          <div class="ai-chat-header">${svg('annotate', 'width="20" height="20"')} ${LANG==='ar'?'دردشة ذكية':'AI Chat'}</div>
+          <div class="ai-chat-header">${svg('bolt', 'width="20" height="20"')} ${LANG==='ar'?'المساعد الشخصي الذكي':'Personal AI Assistant'}</div>
           <div class="ai-chat-messages" id="aiMsgs">
             ${messages.map(m => `<div class="msg ${m.role}">${m.content}</div>`).join('')}
           </div>
@@ -2906,13 +2910,11 @@ function renderAiAssistant(main) {
             </div>
           </div>
           <div class="card" style="margin-bottom:16px">
-            <h4 style="margin-bottom:8px">${LANG==='ar'?'إعدادات AI':'AI Settings'}</h4>
-            <input type="password" class="input input-sm" id="aiKeyIn" placeholder="OpenAI API Key (sk-...)" style="margin-bottom:8px" value="${localStorage.getItem('pdf_studio_openai_key')||''}">
-            <button class="btn btn-sm btn-block" onclick="window.__ai_saveKey()">${LANG==='ar'?'حفظ المفتاح':'Save Key'}</button>
-            <p style="font-size:10px;margin-top:6px">
-              <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--primary);text-decoration:underline">${LANG==='ar'?'كيف أحصل على مفتاح؟':'How to get a key?'}</a>
-            </p>
-            <p style="font-size:10px;color:var(--muted);margin-top:4px">${LANG==='ar'?'اختياري: لتحليل أعمق وذكاء حقيقي.':'Optional: For deeper analysis and real AI.'}</p>
+            <h4 style="margin-bottom:8px">${LANG==='ar'?'الذكاء الاصطناعي الشخصي':'Personal AI'}</h4>
+            <p style="font-size:12px;color:var(--muted)">${LANG==='ar'?'يعمل هذا المساعد محلياً بالكامل على جهازك لضمان خصوصية ملفاتك 100%.':'This assistant works entirely locally on your device to ensure 100% privacy.'}</p>
+            <div style="margin-top:10px; padding:8px; background:rgba(99,102,241,0.1); border-radius:6px; font-size:11px; color:var(--primary)">
+              ${LANG==='ar'?'وضع الخصوصية مفعل: لا يتم إرسال أي بيانات للخارج.':'Privacy Mode Active: No data is sent externally.'}
+            </div>
           </div>
           <div class="card">
             <h4 style="margin-bottom:8px">${LANG==='ar'?'معلومات الملف':'File Info'}</h4>
@@ -2946,8 +2948,7 @@ function renderAiAssistant(main) {
     messages.push(aiMsg);
     paint();
     
-    const response = await callAI(val, 
-      `Context from PDF: ${pdfText.substring(0, 3000)}\n\nYou are a helpful PDF assistant. Answer based on the provided context. If the answer is not in the context, say you don't know.`);
+    const response = await callAI(val, pdfText);
     
     messages[messages.length-1].content = response;
     paint();
@@ -2966,17 +2967,13 @@ function renderAiAssistant(main) {
     messages.push(aiMsg);
     paint();
     
-    const response = await callAI(`Context from PDF: ${pdfText.substring(0, 4000)}\n\nTask: ${prompt}`);
+    const response = await callAI(prompt, pdfText);
     messages[messages.length-1].content = response;
     paint();
   };
 
   window.__ai_reset = () => { file = null; pdfText = ""; messages = []; paint(); };
-  window.__ai_saveKey = () => {
-    const key = document.getElementById('aiKeyIn').value.trim();
-    localStorage.setItem('pdf_studio_openai_key', key);
-    toast(LANG==='ar'?'تم حفظ المفتاح بنجاح':'API Key saved successfully');
-  };
+  // OpenAI key saving removed for Personal AI mode
 
   paint();
 }
