@@ -1040,11 +1040,25 @@ async function callAI(prompt, context = "") {
 
   if (scoredParagraphs.length > 0) {
     const bestMatch = scoredParagraphs[0].p.trim();
-    // Return only the most relevant part, keeping it concise
-    const lines = bestMatch.split('\n').filter(l => l.trim().length > 2);
-    const conciseResult = lines.slice(0, 3).join('\n');
     
-    return conciseResult;
+    // Find the specific sentence or line within the paragraph that matches the query best
+    const subSentences = bestMatch.split(/[.!?\n\u060c]/).filter(s => s.trim().length > 2);
+    let bestSub = subSentences[0];
+    let maxSubScore = -1;
+
+    subSentences.forEach(s => {
+      let sScore = 0;
+      const sLow = s.toLowerCase();
+      queryWords.forEach(qw => {
+        if (sLow.includes(qw)) sScore += qw.length;
+      });
+      if (sScore > maxSubScore) {
+        maxSubScore = sScore;
+        bestSub = s;
+      }
+    });
+
+    return bestSub.trim();
   }
 
   return LANG === 'ar' ? "لم أجد معلومة دقيقة. حاول كتابة الاسم أو الكلمة الأساسية بوضوح." : "No precise info found. Try typing the name or keyword clearly.";
