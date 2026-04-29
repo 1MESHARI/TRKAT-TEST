@@ -215,7 +215,7 @@
   .file-item .grip{color:var(--muted); cursor:grab; padding:4px}
   .file-item.drag{opacity:.4}
   .file-item .info{flex:1; min-width:0}
-  .file-item .info .name{font-weight:600; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .file-item .info .name{font-weight:600; font-size:14px; white-space:normal; word-break:break-word; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical}
   .file-item .info .meta{font-size:12px; color:var(--muted)}
   .file-item .file-icon{width:36px;height:36px;border-radius:8px;background:var(--primary-soft);color:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .file-item .file-icon svg{width:16px;height:16px}
@@ -270,7 +270,7 @@
   .doc-stage canvas{display:block; background:#fff; box-shadow:0 8px 30px -8px rgba(0,0,0,.25); border-radius:4px}
   .placement{position:absolute; transform:translate(-50%,-50%); cursor:move; user-select:none; touch-action:none}
   .placement img{max-width:100%; display:block; pointer-events:none; filter:drop-shadow(0 1px 1px rgba(0,0,0,.15))}
-  .placement.text{font-weight:600; color:#1e1b4b; background:rgba(255,255,255,.9); padding:3px 8px; border-radius:4px; white-space:nowrap; line-height:1.2}
+  .placement.text{font-weight:600; color:#1e1b4b; background:transparent; padding:3px 8px; border-radius:4px; white-space:nowrap; line-height:1.2}
   .placement.highlight{background:rgba(250,204,21,.45); border-radius:2px; transform:translate(0,-50%)}
   .placement.stamp{font-weight:800; padding:5px 14px; border:2.5px solid; border-radius:6px; text-transform:uppercase; letter-spacing:.05em; background:rgba(255,255,255,.6); white-space:nowrap}
   .placement.selected{outline:2px dashed #2563eb; outline-offset:2px; z-index:10}
@@ -2209,11 +2209,27 @@ async function renderAnnotate(main){
         stage.querySelectorAll('.placement.selected').forEach(p => p.classList.remove('selected'));
         const r = e.currentTarget.getBoundingClientRect();
         const x = (e.clientX-r.left)/r.width, y = (e.clientY-r.top)/r.height;
-        const id = 'a'+Math.random().toString(36).slice(2);
-        if (tool==='text'){ if (!textIn.trim()) return; anns.push({id,page,type:'text',x,y,text:textIn,size:textSize,color:textColor}); }
-        else if (tool==='highlight') anns.push({id,page,type:'highlight',x,y,w:0.20,h:0.030,color:hlColor});
-        else anns.push({id,page,type:'stamp',x,y,kind:stampKind,size:14});
-        drawPage();
+        
+        const title = LANG === 'ar' ? 'اختر إجراءً' : 'Choose Action';
+        const body = `
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <button class="btn btn-outline" onclick="window.__add_ann('text', ${x}, ${y})">${svg('annotate')} ${tt('annotate.text')}</button>
+            <button class="btn btn-outline" onclick="window.__add_ann('highlight', ${x}, ${y})">${svg('view')} ${tt('annotate.highlight')}</button>
+            <button class="btn btn-outline" onclick="window.__add_ann('stamp', ${x}, ${y})">${svg('watermark')} ${tt('annotate.stamp')}</button>
+            <button class="btn btn-outline" onclick="window.__add_ann('sign', ${x}, ${y})">${svg('sign')} ${tt('sign.title')}</button>
+          </div>
+        `;
+        openModal(title, body, `<button class="btn btn-ghost" onclick="closeModal()">${tt('actions.back')}</button>`);
+        
+        window.__add_ann = (type, ax, ay) => {
+          closeModal();
+          const id = 'a'+Math.random().toString(36).slice(2);
+          if (type === 'text') { if (!textIn.trim()) return; anns.push({id,page,type:'text',x:ax,y:ay,text:textIn,size:textSize,color:textColor}); }
+          else if (type === 'highlight') anns.push({id,page,type:'highlight',x:ax,y:ay,w:0.20,h:0.030,color:hlColor});
+          else if (type === 'stamp') anns.push({id,page,type:'stamp',x:ax,y:ay,kind:stampKind,size:14});
+          else if (type === 'sign') nav('sign');
+          drawPage();
+        };
       };
     }
     drawPage();
