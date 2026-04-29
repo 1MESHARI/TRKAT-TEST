@@ -433,6 +433,35 @@
 
   /* RTL specific tweaks */
   [dir="rtl"] .rotate-rtl{transform:scaleX(-1)}
+
+  /* Modal */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1000;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+    backdrop-filter:blur(4px); opacity:0; pointer-events:none; transition:opacity .2s;
+  }
+  .modal-overlay.active{opacity:1; pointer-events:auto}
+  .modal{
+    background:var(--card); border-radius:16px; width:100%; max-width:420px;
+    box-shadow:var(--shadow-lg); transform:translateY(20px); transition:transform .2s;
+    overflow:hidden;
+  }
+  .modal-overlay.active .modal{transform:translateY(0)}
+  .modal-head{padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between}
+  .modal-head h3{margin:0; font-size:18px; font-weight:800}
+  .modal-body{padding:24px}
+  .modal-foot{padding:16px 24px; background:var(--bg); display:flex; justify-content:flex-end; gap:10px}
+
+  /* Spinner */
+  .spinner{
+    width:20px; height:20px; border:3px solid var(--primary-soft); border-top-color:var(--primary);
+    border-radius:50%; animation:spin .8s linear infinite;
+  }
+  @keyframes spin{ to{transform:rotate(360deg)} }
+
+  /* Progress Bar */
+  .progress-wrap{width:100%; height:6px; background:var(--primary-soft); border-radius:10px; overflow:hidden; margin:10px 0}
+  .progress-bar{height:100%; background:var(--primary); width:0%; transition:width .3s ease}
 </style>
 </head>
 <body>
@@ -457,6 +486,13 @@
   <footer id="appFooter"></footer>
 </div>
 <div class="toast-wrap" id="toasts"></div>
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-head"><h3 id="modalTitle"></h3><button class="icon-btn" onclick="closeModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot" id="modalFoot"></div>
+  </div>
+</div>
 
 <script type="module">
 import { PDFDocument, StandardFonts, rgb, degrees, LineCapStyle } from 'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm';
@@ -557,7 +593,9 @@ const I18N = {
       pdfToJpg:{name:"PDF إلى JPG", desc:"صدّر كل صفحة كصورة"},
       extractText:{name:"استخراج النص", desc:"استخرج كل النصوص من PDF"},
       crop:{name:"اقتصاص الصفحات", desc:"حدد منطقة وقصّ الهوامش"},
-      ocr:{name:"OCR (تحويل الصور لنص)", desc:"استخرج النص من PDF ممسوح ضوئيًا"}
+      ocr:{name:"OCR (تحويل الصور لنص)", desc:"استخرج النص من PDF ممسوح ضوئيًا"},
+      repair:{name:"إصلاح PDF", desc:"محاولة إصلاح ملفات PDF التالفة"},
+      number:{name:"ترقيم الصفحات", desc:"إضافة أرقام الصفحات للمستند"}
     },
     viewer:{title:"عارض PDF", subtitle:"تصفّح صفحات ملفك مع المصغرات والتكبير"},
     merge:{title:"دمج ملفات PDF", subtitle:"اجمع عدة ملفات في مستند واحد بترتيب تختاره", output:"اسم الملف الناتج", action:"دمج وتنزيل", needTwo:"أضف ملفين على الأقل"},
@@ -667,7 +705,9 @@ const I18N = {
       pdfToJpg:{name:"PDF to JPG", desc:"Export each page as an image"},
       extractText:{name:"Extract Text", desc:"Pull all text out of a PDF"},
       crop:{name:"Crop Pages", desc:"Trim margins from page area"},
-      ocr:{name:"OCR (image to text)", desc:"Recognize text from a scanned PDF"}
+      ocr:{name:"OCR (image to text)", desc:"Recognize text from a scanned PDF"},
+      repair:{name:"Repair PDF", desc:"Try to fix corrupted PDF files"},
+      number:{name:"Page Numbers", desc:"Add page numbers to your document"}
     },
     viewer:{title:"PDF Viewer", subtitle:"Browse pages with thumbnails and zoom"},
     merge:{title:"Merge PDFs", subtitle:"Combine PDFs into one document in your chosen order", output:"Output filename", action:"Merge & Download", needTwo:"Add at least two PDFs"},
@@ -691,7 +731,16 @@ const I18N = {
 };
 
 let LANG = localStorage.getItem('pdf-lang') || 'ar';
-let THEME = localStorage.getItem('pdf-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+let THEME = localStorage.getItem('pdf-theme');
+if (!THEME) {
+  THEME = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (!localStorage.getItem('pdf-theme')) {
+      THEME = e.matches ? 'dark' : 'light';
+      applyTheme();
+    }
+  });
+}
 
 function tt(key){
   const parts = key.split('.');
@@ -768,6 +817,8 @@ const ICONS = {
   extractText:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/>',
   crop:'<path d="M6.13 1 6 16a2 2 0 0 0 2 2h15"/><path d="M1 6.13 16 6a2 2 0 0 1 2 2v15"/>',
   ocr:'<path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/><path d="M7 8h6"/><path d="M7 16h4"/>',
+  repair:'<path d="m14.7 6.3-1.1-1.1"/><path d="m19 9.4-1.1-1.1"/><path d="M20 4.1 15.9 8.2"/><path d="m15 13-3 3"/><path d="m9 17-2 2"/><path d="m14 8 2.5-2.5a2 2 0 0 1 2.8 2.8L16.8 10.8"/><path d="m12 10-8 8v4h4l8-8"/><path d="m19 15 3 3-3 3"/><path d="m15 19 3-3 3 3"/>',
+  number:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M10 13h4"/><path d="M12 13v4"/>',
   draw:'<path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/>',
   shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>',
   bolt:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
@@ -807,14 +858,39 @@ function deriveName(orig, suffix, ext='pdf'){
   const base = orig.replace(/\.[^.]+$/,'');
   return `${base}-${suffix}.${ext}`;
 }
+function openModal(title, bodyHtml, footHtml){
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = bodyHtml;
+  document.getElementById('modalFoot').innerHTML = footHtml;
+  document.getElementById('modalOverlay').classList.add('active');
+}
+window.closeModal = () => { document.getElementById('modalOverlay').classList.remove('active'); };
+
 function downloadBlob(blob, name){
-  const newName = prompt(LANG === 'ar' ? 'أدخل اسم الملف:' : 'Enter file name:', name);
-  if (newName === null) return;
-  const finalName = newName.trim() || name;
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = finalName; document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  const title = LANG === 'ar' ? 'حفظ الملف' : 'Save File';
+  const label = LANG === 'ar' ? 'أدخل اسم الملف:' : 'Enter file name:';
+  const saveBtn = LANG === 'ar' ? 'حفظ' : 'Save';
+  const cancelBtn = LANG === 'ar' ? 'إلغاء' : 'Cancel';
+  
+  const body = `<div class="field"><label>${label}</label><input class="input" id="modalInput" value="${name}" autofocus/></div>`;
+  const foot = `
+    <button class="btn btn-outline" onclick="closeModal()">${cancelBtn}</button>
+    <button class="btn" id="modalConfirm">${saveBtn}</button>
+  `;
+  
+  openModal(title, body, foot);
+  const input = document.getElementById('modalInput');
+  input.select();
+  input.onkeyup = e => { if(e.key==='Enter') document.getElementById('modalConfirm').click(); };
+  
+  document.getElementById('modalConfirm').onclick = () => {
+    const finalName = input.value.trim() || name;
+    closeModal();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = finalName; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  };
 }
 function downloadBytes(bytes, name, mime='application/pdf'){
   downloadBlob(new Blob([bytes], {type:mime}), name);
@@ -830,7 +906,56 @@ async function loadPdfJs(buf, password){
   return await pdfjsLib.getDocument({data:new Uint8Array(buf), password}).promise;
 }
 
+// Web Worker Helper for background processing
+function runInWorker(fn, args) {
+  return new Promise((resolve, reject) => {
+    const blob = new Blob([`
+      onmessage = async function(e) {
+        try {
+          const result = await (${fn.toString()})(...e.data);
+          postMessage({ success: true, result });
+        } catch (err) {
+          postMessage({ success: false, error: err.message });
+        }
+      }
+    `], { type: 'application/javascript' });
+    const worker = new Worker(URL.createObjectURL(blob));
+    worker.onmessage = e => {
+      if (e.data.success) resolve(e.data.result);
+      else reject(new Error(e.data.error));
+      worker.terminate();
+    };
+    worker.onerror = err => { reject(err); worker.terminate(); };
+    worker.postMessage(args);
+  });
+}
+
 /* ================== Dropzone helper ================== */
+// Global Drag & Drop for Tools
+window.addEventListener('dragover', e => e.preventDefault());
+window.addEventListener('drop', e => {
+  if (e.target.closest('.dropzone')) return;
+  e.preventDefault();
+  const files = Array.from(e.dataTransfer.files);
+  if (files.length > 0) {
+    const file = files[0];
+    if (file.type === 'application/pdf') {
+      if (window.location.hash === '' || window.location.hash === '#home') {
+        nav('viewer');
+        setTimeout(() => {
+          const dz = document.querySelector('.dropzone input');
+          if (dz) {
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            dz.files = dt.files;
+            dz.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        }, 100);
+      }
+    }
+  }
+});
+
 function dropzone(opts){
   const { multi=false, accept='application/pdf', label, onFiles } = opts;
   const id = 'dz_'+Math.random().toString(36).slice(2,8);
@@ -884,7 +1009,9 @@ const ROUTES = {
   pdfToJpg: renderPdfToJpg,
   extractText: renderExtractText,
   crop: renderCrop,
-  ocr: renderOcr
+  ocr: renderOcr,
+  repair: renderRepair,
+  number: renderNumber
 };
 let currentRoute = 'home';
 let routeState = null;
@@ -952,11 +1079,11 @@ function renderFooter(){
 function renderHome(main){
   // Popular tools shown like iLovePDF
   const popular = ['merge','split','compress','organize','sign','watermark','annotate','ocr'];
-  const sections = [
+    const sections = [
     {key:'organize', tools:['merge','split','organize','rotate','compress','crop']},
-    {key:'edit', tools:['sign','annotate','watermark']},
+    {key:'edit', tools:['sign','annotate','watermark','number']},
     {key:'convert', tools:['jpgToPdf','pdfToJpg','extractText','ocr','viewer']},
-    {key:'secure', tools:['protect','unlock']}
+    {key:'secure', tools:['protect','unlock','repair']}
   ];
   const badges = [
     {key:'private', icon:'shield'},
@@ -2350,6 +2477,77 @@ async function renderCrop(main){
     finally { btn.disabled = false; }
   }
 
+  paint();
+}
+
+/* ================== REPAIR ================== */
+function renderRepair(main){
+  main.innerHTML = `<div class="tool-page">${toolHead('repair')}<div class="card" id="rpcard"></div></div>`;
+  const card = document.getElementById('rpcard');
+  let file=null;
+  function paint(){
+    if (!file){ card.innerHTML = dropzone({onFiles:fs=>{file=fs[0]; paint();}}); return; }
+    card.innerHTML = `
+      <div style="font-weight:600;margin-bottom:14px">${file.name}</div>
+      <button class="btn btn-block" id="rpdo">${svg('bolt')} ${tt('tools.repair.name')}</button>
+    `;
+    document.getElementById('rpdo').onclick = async () => {
+      const btn = document.getElementById('rpdo'); btn.disabled = true;
+      try {
+        const doc = await PDFDocument.load(await file.arrayBuffer(), { ignoreEncryption: true });
+        downloadBytes(await doc.save(), deriveName(file.name, 'repaired'));
+        toast(tt('actions.done'));
+      } catch(e) {
+        console.error(e); toast(tt('errors.generic'), 'error');
+      } finally { btn.disabled = false; }
+    };
+  }
+  paint();
+}
+
+/* ================== PAGE NUMBERS ================== */
+function renderNumber(main){
+  main.innerHTML = `<div class="tool-page">${toolHead('number')}<div class="card" id="ncard"></div></div>`;
+  const card = document.getElementById('ncard');
+  let file=null, pos='bottomCenter', start=1;
+  function paint(){
+    if (!file){ card.innerHTML = dropzone({onFiles:fs=>{file=fs[0]; paint();}}); return; }
+    card.innerHTML = `
+      <div style="font-weight:600;margin-bottom:14px">${file.name}</div>
+      <div class="field"><label>${LANG==='ar'?'الموضع':'Position'}</label>
+        <select class="select" id="npos">
+          <option value="bottomCenter" ${pos==='bottomCenter'?'selected':''}>${LANG==='ar'?'أسفل الوسط':'Bottom Center'}</option>
+          <option value="bottomRight" ${pos==='bottomRight'?'selected':''}>${LANG==='ar'?'أسفل اليمين':'Bottom Right'}</option>
+          <option value="bottomLeft" ${pos==='bottomLeft'?'selected':''}>${LANG==='ar'?'أسفل اليسار':'Bottom Left'}</option>
+        </select>
+      </div>
+      <button class="btn btn-block" id="ndo">${svg('arrowDown')} ${tt('actions.download')}</button>
+    `;
+    document.getElementById('npos').onchange = e => pos = e.target.value;
+    document.getElementById('ndo').onclick = async () => {
+      const btn = document.getElementById('ndo'); btn.disabled = true;
+      try {
+        const doc = await PDFDocument.load(await file.arrayBuffer(), { ignoreEncryption: true });
+        const pages = doc.getPages();
+        const font = await doc.embedFont(StandardFonts.Helvetica);
+        pages.forEach((p, i) => {
+          const { width, height } = p.getSize();
+          const text = `${i + start}`;
+          const fontSize = 12;
+          const textWidth = font.widthOfTextAtSize(text, fontSize);
+          let x = width / 2 - textWidth / 2;
+          let y = 20;
+          if (pos === 'bottomRight') x = width - textWidth - 20;
+          if (pos === 'bottomLeft') x = 20;
+          p.drawText(text, { x, y, size: fontSize, font, color: rgb(0, 0, 0) });
+        });
+        downloadBytes(await doc.save(), deriveName(file.name, 'numbered'));
+        toast(tt('actions.done'));
+      } catch(e) {
+        console.error(e); toast(tt('errors.generic'), 'error');
+      } finally { btn.disabled = false; }
+    };
+  }
   paint();
 }
 
