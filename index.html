@@ -999,34 +999,55 @@ async function callAI(prompt, context = "") {
     return (LANG === 'ar' ? "الكلمات المفتاحية الأكثر أهمية في المستند:\n" : "Most important keywords in the document:\n") + top.join(' • ');
   }
 
-  // 3. Advanced Local Semantic Search
+  // 3. Ultra-Smart Local Search (Fuzzy + Contextual)
   const queryWords = query.split(/\s+/).filter(w => w.length > 2);
+  
+  // Identify if user is asking for a name or specific entity
+  const isAskingForName = query.includes("من هو") || query.includes("اسم") || query.includes("who is") || query.includes("name");
+
   const scoredParagraphs = paragraphs.map(p => {
     let score = 0;
     const pLow = p.toLowerCase();
+    
     queryWords.forEach(qw => {
+      // 1. Exact & Partial Match
       const regex = new RegExp(qw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
       const matches = pLow.match(regex);
-      if (matches) {
-        score += matches.length * qw.length;
-        if (pLow.includes(` ${qw} `)) score += 10; // Exact word bonus
+      if (matches) score += matches.length * 10;
+
+      // 2. Fuzzy Match (Simple Levenshtein-like check for small typos)
+      if (!matches && pLow.length < 1000) {
+        const words = pLow.split(/\s+/);
+        words.forEach(pw => {
+          if (pw.length > 3 && (pw.includes(qw) || qw.includes(pw))) score += 5;
+        });
       }
     });
-    // Boost paragraphs that contain multiple unique query words
+
+    // 3. Name Recognition Boost
+    if (isAskingForName) {
+      // Look for patterns like "Name: X" or "Mr. X" or Arabic name patterns
+      const namePatterns = [/الاسم[:\s]+([^\n]+)/g, /السيد[:\s]+([^\n]+)/g, /الموظف[:\s]+([^\n]+)/g];
+      namePatterns.forEach(pattern => { if (pattern.test(p)) score += 20; });
+    }
+
+    // 4. Contextual Density
     const uniqueMatches = queryWords.filter(qw => pLow.includes(qw)).length;
-    score *= (1 + uniqueMatches * 0.5);
+    score *= (1 + uniqueMatches);
     
     return { p, score };
   }).filter(sp => sp.score > 0).sort((a, b) => b.score - a.score);
 
   if (scoredParagraphs.length > 0) {
-    const bestMatches = scoredParagraphs.slice(0, 3).map(sp => sp.p.trim()).join('\n\n---\n\n');
-    return (LANG === 'ar' ? "بناءً على تحليلي الشخصي للمستند، وجدت هذه المعلومات:\n\n" : "Based on my personal analysis, I found this information:\n\n") + bestMatches;
+    const bestMatch = scoredParagraphs[0].p.trim();
+    // Return only the most relevant part, keeping it concise
+    const lines = bestMatch.split('\n').filter(l => l.trim().length > 2);
+    const conciseResult = lines.slice(0, 3).join('\n');
+    
+    return conciseResult;
   }
 
-  return LANG === 'ar' ? 
-    "عذراً، لم أجد إجابة مباشرة لسؤالك في النص المتاح. حاول صياغة السؤال بكلمات مختلفة موجودة في المستند." :
-    "Sorry, I couldn't find a direct answer to your question in the available text. Try using different keywords from the document.";
+  return LANG === 'ar' ? "لم أجد معلومة دقيقة. حاول كتابة الاسم أو الكلمة الأساسية بوضوح." : "No precise info found. Try typing the name or keyword clearly.";
 }
 
 async function runLocalOCR(pdf) {
