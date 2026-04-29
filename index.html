@@ -808,9 +808,12 @@ function deriveName(orig, suffix, ext='pdf'){
   return `${base}-${suffix}.${ext}`;
 }
 function downloadBlob(blob, name){
+  const newName = prompt(LANG === 'ar' ? 'أدخل اسم الملف:' : 'Enter file name:', name);
+  if (newName === null) return;
+  const finalName = newName.trim() || name;
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  a.href = url; a.download = finalName; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url), 1000);
 }
 function downloadBytes(bytes, name, mime='application/pdf'){
