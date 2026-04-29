@@ -945,28 +945,46 @@ async function loadPdfJs(buf, password){
 
 /* ================== AI ASSISTANT HELPERS ================== */
 async function callAI(prompt, context = "") {
-  if (!context) return LANG === 'ar' ? "لم أتمكن من العثور على نص في الملف لتحليله." : "I couldn't find any text in the file to analyze.";
+  const query = prompt.trim().toLowerCase();
+  const cleanContext = context.replace(/__SCANNED_PDF__/g, "").trim();
+  
+  if (!cleanContext || cleanContext.length < 10) {
+    return LANG === 'ar' ? "لم أتمكن من العثور على نص كافٍ في الملف لتحليله. يرجى التأكد من أن الملف يحتوي على نصوص واضحة." : "I couldn't find enough text in the file to analyze. Please ensure the file contains clear text.";
+  }
 
-  const query = prompt.toLowerCase();
-  const paragraphs = context.split(/\n\s*\n/).filter(p => p.trim().length > 10);
-  const sentences = context.split(/[.!?\n]/).filter(s => s.trim().length > 15);
+  const paragraphs = cleanContext.split(/\n\s*\n/).filter(p => p.trim().length > 10);
+  const sentences = cleanContext.split(/[.!?\n\u060c]/).filter(s => s.trim().length > 15);
 
-  // 1. Advanced Local Summary (Extractive)
-  if (query.includes("summarize") || query.includes("تلخيص") || query.includes("ملخص")) {
-    // Score sentences based on keywords and position
-    const words = context.match(/[\u0600-\u06FF\w]{5,}/g) || [];
-    const freq = {}; words.forEach(w => freq[w.toLowerCase()] = (freq[w.toLowerCase()] || 0) + 1);
+  // 1. Priority: Summary Commands
+  const isSummaryRequest = query.includes("لخص") || query.includes("تلخيص") || query.includes("ملخص") || query.includes("summarize") || query.includes("summary");
+  
+  if (isSummaryRequest) {
+    // Advanced Extractive Summarization
+    const words = cleanContext.match(/[\u0600-\u06FF\w]{4,}/g) || [];
+    const freq = {}; 
+    words.forEach(w => { const low = w.toLowerCase(); freq[low] = (freq[low] || 0) + 1; });
     
     const scoredSentences = sentences.map((s, i) => {
       let score = 0;
-      const sWords = s.toLowerCase().match(/[\u0600-\u06FF\w]{5,}/g) || [];
+      const sWords = s.toLowerCase().match(/[\u0600-\u06FF\w]{4,}/g) || [];
       sWords.forEach(w => score += (freq[w] || 0));
-      if (i < 5) score += 50; // Boost early sentences
+      if (i < 10) score += 100; // Strong boost for opening sentences
       return { s, score };
     }).sort((a, b) => b.score - a.score);
 
-    const summary = scoredSentences.slice(0, 8).map(obj => `• ${obj.s.trim()}`).join('\n');
-    return (LANG === 'ar' ? "إليك ملخص ذكي لأهم النقاط في المستند:\n\n" : "Here is a smart summary of the key points:\n\n") + summary;
+    const uniqueSentences = [];
+    const seen = new Set();
+    for (const obj of scoredSentences) {
+      const trimmed = obj.s.trim();
+      if (trimmed.length > 30 && !seen.has(trimmed.substring(0, 20))) {
+        uniqueSentences.push(trimmed);
+        seen.add(trimmed.substring(0, 20));
+      }
+      if (uniqueSentences.length >= 7) break;
+    }
+
+    return (LANG === 'ar' ? "إليك ملخص ذكي لأهم النقاط في المستند:\n\n" : "Here is a smart summary of the key points:\n\n") + 
+           uniqueSentences.map(s => `• ${s}`).join('\n');
   }
 
   // 2. Advanced Keywords
@@ -1028,19 +1046,28 @@ async function runLocalOCR(pdf) {
 }
 
 async function getPdfText(file) {
-  const pdf = await loadPdfJs(await file.arrayBuffer());
-  let fullText = "";
-  for (let i = 1; i <= Math.min(pdf.numPages, 10); i++) {
-    const page = await pdf.getPage(i);
-    const content = await page.getTextContent();
-    const pageText = content.items.map(it => it.str).join(" ");
-    fullText += pageText + "\n";
-  }
-  
-  if (fullText.trim().length < 10) {
+  try {
+    const pdf = await loadPdfJs(await file.arrayBuffer());
+    let fullText = "";
+    // Read up to 20 pages for better context
+    const maxPages = Math.min(pdf.numPages, 20);
+    for (let i = 1; i <= maxPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      // Better text joining with proper spacing
+      const pageText = content.items.map(it => it.str).join(" ");
+      fullText += pageText + "\n\n";
+    }
+    
+    const cleanText = fullText.trim();
+    if (cleanText.length < 20) {
+      return "__SCANNED_PDF__";
+    }
+    return cleanText;
+  } catch (e) {
+    console.error("PDF Text Extraction Error:", e);
     return "__SCANNED_PDF__";
   }
-  return fullText;
 }
 
 function openSignatureModal(onConfirm) {
