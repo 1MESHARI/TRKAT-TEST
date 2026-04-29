@@ -1003,10 +1003,19 @@ async function callAI(prompt, systemPrompt = "") {
 async function getPdfText(file) {
   const pdf = await loadPdfJs(await file.arrayBuffer());
   let fullText = "";
-  for (let i = 1; i <= Math.min(pdf.numPages, 10); i++) { // Limit to first 10 pages for AI context
+  for (let i = 1; i <= Math.min(pdf.numPages, 10); i++) {
     const page = await pdf.getPage(i);
     const content = await page.getTextContent();
-    fullText += content.items.map(it => it.str).join(" ") + "\n";
+    const pageText = content.items.map(it => it.str).join(" ");
+    fullText += pageText + "\n";
+  }
+  
+  // If no text found, it might be a scanned PDF. Try a very basic OCR hint or alert.
+  if (fullText.trim().length < 10) {
+    console.log("No text found, possibly a scanned PDF.");
+    // In a real app, we'd trigger Tesseract.js here. 
+    // For now, we'll return a special marker to inform the AI Assistant.
+    return "__SCANNED_PDF__";
   }
   return fullText;
 }
@@ -2836,7 +2845,13 @@ function renderAiAssistant(main) {
         file = fs[0]; 
         card.innerHTML = `<div class="loading"><div class="spinner"></div><p>${LANG==='ar'?'جارٍ قراءة الملف وتحليله...':'Reading and analyzing file...'}</p></div>`;
         pdfText = await getPdfText(file);
-        messages = [{role:'ai', content: LANG==='ar' ? `مرحباً! أنا مساعدك الذكي. لقد قرأت ملف "${file.name}". كيف يمكنني مساعدتك اليوم؟ يمكنك طلب تلخيص الملف أو طرح أي سؤال حول محتواه.` : `Hello! I'm your AI assistant. I've read "${file.name}". How can I help you today? You can ask for a summary or any question about its content.`}];
+        let welcomeMsg = LANG==='ar' ? `مرحباً! أنا مساعدك الذكي. لقد قرأت ملف "${file.name}". كيف يمكنني مساعدتك اليوم؟` : `Hello! I'm your AI assistant. I've read "${file.name}". How can I help you today?`;
+        if (pdfText === "__SCANNED_PDF__") {
+          welcomeMsg = LANG==='ar' ? 
+            `لقد قرأت الملف، ولكن يبدو أنه "نسخة ممسوحة ضوئياً" (صور) ولا يحتوي على نص رقمي. المساعد المحلي قد يواجه صعوبة في تحليله. يفضل استخدام أداة OCR أولاً أو إضافة مفتاح OpenAI لتحليل أدق.` :
+            `I've read the file, but it seems to be a "scanned version" (images) and contains no digital text. The local assistant might struggle to analyze it. Try using the OCR tool first or add an OpenAI key for better analysis.`;
+        }
+        messages = [{role:'ai', content: welcomeMsg}];
         paint(); 
       }})}</div>`;
       return;
@@ -2867,7 +2882,10 @@ function renderAiAssistant(main) {
             <h4 style="margin-bottom:8px">${LANG==='ar'?'إعدادات AI':'AI Settings'}</h4>
             <input type="password" class="input input-sm" id="aiKeyIn" placeholder="OpenAI API Key (sk-...)" style="margin-bottom:8px" value="${localStorage.getItem('pdf_studio_openai_key')||''}">
             <button class="btn btn-sm btn-block" onclick="window.__ai_saveKey()">${LANG==='ar'?'حفظ المفتاح':'Save Key'}</button>
-            <p style="font-size:10px;color:var(--muted);margin-top:6px">${LANG==='ar'?'اختياري: لتحليل أعمق وذكاء حقيقي.':'Optional: For deeper analysis and real AI.'}</p>
+            <p style="font-size:10px;margin-top:6px">
+              <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--primary);text-decoration:underline">${LANG==='ar'?'كيف أحصل على مفتاح؟':'How to get a key?'}</a>
+            </p>
+            <p style="font-size:10px;color:var(--muted);margin-top:4px">${LANG==='ar'?'اختياري: لتحليل أعمق وذكاء حقيقي.':'Optional: For deeper analysis and real AI.'}</p>
           </div>
           <div class="card">
             <h4 style="margin-bottom:8px">${LANG==='ar'?'معلومات الملف':'File Info'}</h4>
